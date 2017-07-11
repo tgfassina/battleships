@@ -4,7 +4,9 @@ var Player = function() {
 
 	var api = {};
 
-	api.signUp = function() {
+	api.signUp = function(name) {
+		if (!name) throw new Error;
+
 		return Guid.raw();
 	};
 
