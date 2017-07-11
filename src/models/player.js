@@ -1,8 +1,11 @@
 var Player = function() {
+
+	var Guid = require('guid');
+
 	var api = {};
 
 	api.signUp = function() {
-		return '00000000-0000-0000-0000-000000000000';
+		return Guid.raw();
 	};
 
 	return api;
