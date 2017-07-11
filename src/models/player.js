@@ -1,4 +1,4 @@
-var Player = function() {
+var Player = function(dao) {
 
 	var Guid = require('guid');
 
@@ -6,8 +6,11 @@ var Player = function() {
 
 	api.signUp = function(name) {
 		if (!name) throw new Error;
+		var guid = Guid.raw();
 
-		return Guid.raw();
+		// dao.save(name, guid);
+
+		return guid;
 	};
 
 	return api;

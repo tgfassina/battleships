@@ -1,11 +1,12 @@
 describe('Player', function() {
 
-	var Player = require('../src/models/player.js');
+	var Player = require('../models/player.js');
+	var playerDaoFake = require('./fakes/player-dao-fake.js');
 
 	var player;
 
 	beforeEach(function() {
-		player = Player();
+		player = Player(playerDaoFake);
 	});
 
 	describe('signUp', function() {

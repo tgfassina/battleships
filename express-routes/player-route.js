@@ -1,9 +1,9 @@
-PlayerRoute = function(expressApp) {
+PlayerRoute = function(app, playerDao) {
 
 	var Player = require('../src/models/player.js');
-	var player = Player();
+	var player = Player(playerDao);
 
-	expressApp.post('/player/signup', function (req, res) {
+	app.post('/player/signup', function (req, res) {
 		var token = player.signUp(req.body.name);
 
 		res.send({
