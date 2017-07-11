@@ -4,8 +4,8 @@ var bodyParser = require('body-parser');
 
 app.use(bodyParser.json())
 
-var PlayerApi = require('./src/apis/player.js');
-PlayerApi(app);
+var PlayerRoute = require('./routes/player.js');
+PlayerRoute(app);
 
 
 app.use(function (err, req, res, next) {
