@@ -19,19 +19,25 @@ describe('Game', function() {
 			var invalidGuid = game.create('0000');
 
 			return Promise.all([
-				expect(noGuid).to.eventually.be.rejectedWith('Failed to provide guid'),
-				expect(invalidGuid).to.eventually.be.rejectedWith('Invalid guid')
+				expect(noGuid).to.be.rejectedWith('Failed to provide guid'),
+				expect(invalidGuid).to.be.rejectedWith('Invalid guid')
 			]);
 		});
 
 		it('should provide game id', function() {
-			var promise = player.signUp('Jan').then(function(guid) {
-				return game.create(guid).then(function(gameId) {
-					return gameId.length;
-				});
-			});
+			var signUp = function() {
+				return player.signUp('Jan');
+			};
 
-			return expect(promise).to.eventually.equal(24);
+			var createGame = function(guid) {
+				return game.create(guid);
+			};
+
+			var assert = function(gameId) {
+				expect(gameId.length).to.equal(24);
+			};
+
+			return signUp().then(createGame).then(assert);
 		});
 	});
 
@@ -41,20 +47,37 @@ describe('Game', function() {
 			var invalidGuid = game.join('0000');
 
 			return Promise.all([
-				expect(noGuid).to.eventually.be.rejectedWith('Failed to provide guid'),
-				expect(invalidGuid).to.eventually.be.rejectedWith('Invalid guid')
+				expect(noGuid).to.be.rejectedWith('Failed to provide guid'),
+				expect(invalidGuid).to.be.rejectedWith('Invalid guid')
 			]);
 		});
 
 		it('should require a player who is not in game', function() {
-			var promise = player.signUp('Jan').then(function(guid) {
-				return game.create(guid).then(function(gameId) {
-					return game.join(guid, gameId);
-				});
-			});
+			var _guid;
+			var _joinAttempt;
 
-			return expect(promise)
-				.to.eventually.be.rejectedWith('Already playing this game');
+			var signUp = function() {
+				return player.signUp('Jan').then(function(guid) {
+					return _guid = guid;
+				});
+			};
+
+			var createGame = function(guid) {
+				return game.create(guid);
+			};
+
+			var joinGame = function(gameId) {
+				_joinAttempt = game.join(_guid, gameId);
+			};
+
+			var assert = function() {
+				return expect(_joinAttempt).to.be.rejectedWith('Already playing this game');
+			};
+
+			return signUp()
+				.then(createGame)
+				.then(joinGame)
+				.then(assert);
 		});
 	});
 });

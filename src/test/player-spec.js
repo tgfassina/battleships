@@ -15,28 +15,33 @@ describe('Player', function() {
 			var emptyName = player.signUp('');
 
 			return Promise.all([
-				expect(noName).to.eventually.be.rejectedWith('Failed to provide name'),
-				expect(emptyName).to.eventually.be.rejectedWith('Failed to provide name')
+				expect(noName).to.be.rejectedWith('Failed to provide name'),
+				expect(emptyName).to.be.rejectedWith('Failed to provide name')
 			]);
 		});
 
 		it('should provide guid', function() {
-			var promise = player.signUp('Jan').then(function (guid) {
-				return guid.length;
-			});
+			var assert = function(guid) {
+				return expect(guid.length).to.equal(36);
+			};
 
-			return expect(promise).to.eventually.equal(36);
+			return player.signUp('Jan').then(assert);
 		});
 
 		it('should provide a unique guid', function() {
-			var diff = Promise.all([
-				player.signUp('Jan'),
-				player.signUp('Andy')
-			]).then(function(results) {
-				return results[0] === results[1];
-			});
 
-			return expect(diff).to.eventually.equal(false);
+			var playersSignUp = function() {
+				return Promise.all([
+					player.signUp('Jan'),
+					player.signUp('Andy')
+				]);
+			};
+
+			var assert = function(playersData) {
+				expect(playersData[0]).to.not.equal(playersData[1]);
+			};
+
+			return playersSignUp().then(assert);
 		});
 	});
 });
