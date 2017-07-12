@@ -10,7 +10,8 @@ var Game = function(gameDao, playerDao) {
 		};
 
 		var createGame = function() {
-			return gameDao.save({});
+			var gameData = initGame(guid);
+			return gameDao.save(gameData);
 		};
 
 		var returnGameId = function(gameData) {
@@ -35,7 +36,9 @@ var Game = function(gameDao, playerDao) {
 		};
 
 		var checkAlreadyPlaying = function(gameData) {
-			return Promise.reject('Already playing this game');
+			if (gameData.player1 === guid) {
+				return Promise.reject('Already playing this game');
+			}
 		};
 
 		return playerDao.getByGuid(guid)
@@ -46,6 +49,12 @@ var Game = function(gameDao, playerDao) {
 
 	api.place = function() {
 		return Promise.reject('Invalid ship');
+	};
+
+	var initGame = function(guid) {
+		return {
+			player1: guid
+		};
 	};
 
 	return api;

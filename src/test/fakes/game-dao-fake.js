@@ -5,18 +5,20 @@ var fake = {};
 
 fake.data = [];
 
-fake.save = function() {
-	var data = {
-		_id: idGenerator.get()
-	};
-
+fake.save = function(data) {
+	data._id = idGenerator.get();
 	fake.data.push(data);
-
 	return Promise.resolve(data);
 };
 
 fake.getById = function(id) {
-	return Promise.reject('Game not found');
+	var game = _.find(fake.data, function(g) {
+		return g._id === id;
+	});
+
+	return game ?
+		Promise.resolve(game) :
+		Promise.reject('Game not found');
 };
 
 module.exports = fake;
