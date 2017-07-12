@@ -1,4 +1,4 @@
-describe('Game setup', function() {
+describe('Game setup: placement phase', function() {
 
 	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
