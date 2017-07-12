@@ -5,7 +5,7 @@ var Player = function(dao) {
 	var api = {};
 
 	api.signUp = function(name) {
-		if (!name) return Promise.reject();
+		if (!name) return Promise.reject('Failed to provide name');
 		var guid = Guid.raw();
 
 		return dao.save(name, guid).then(function(data) {

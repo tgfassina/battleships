@@ -11,8 +11,11 @@ describe('Player', function() {
 
 	describe('signUp', function() {
 		it('should require a name', function() {
-			expect(player.signUp()).to.eventually.be.rejected;
-			expect(player.signUp('')).to.eventually.be.rejected;
+			expect(player.signUp())
+				.to.eventually.be.rejectedWith('Failed to provide name');
+
+			expect(player.signUp(''))
+				.to.eventually.be.rejectedWith('Failed to provide name');
 		});
 
 		it('should provide guid', function() {

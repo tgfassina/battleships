@@ -15,8 +15,10 @@ describe('Game', function() {
 
 	describe('create', function() {
 		it('should require existing player guid', function() {
-			expect(game.create()).to.eventually.be.rejected;
-			expect(game.create('0000')).to.eventually.be.rejected;
+			expect(game.create())
+				.to.eventually.be.rejectedWith('Failed to provide guid');
+			expect(game.create('0000'))
+				.to.eventually.be.rejectedWith('Invalid guid');
 		});
 
 		it('should provide game id', function() {
