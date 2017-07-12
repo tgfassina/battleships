@@ -4,10 +4,6 @@ var Game = function(gameDao, playerDao) {
 
 	api.create = function(guid) {
 
-		var rejectPlayerNotFound = function(data) {
-			if (!data) return Promise.reject('Player not found');
-		};
-
 		var createGame = function() {
 			var gameData = initGame(guid);
 			return gameDao.save(gameData);
@@ -17,17 +13,12 @@ var Game = function(gameDao, playerDao) {
 			return gameData['_id'];
 		};
 
-		return playerDao.getByGuid(guid)
-			.then(rejectPlayerNotFound)
+		return assertPlayer(guid)
 			.then(createGame)
 			.then(returnGameId);
 	};
 
 	api.join = function(guid, gameId) {
-
-		var rejectPlayerNotFound = function(data) {
-			if (!data) return Promise.reject('Player not found');
-		};
 
 		var getGame = function() {
 			return gameDao.getById(gameId);
@@ -39,8 +30,7 @@ var Game = function(gameDao, playerDao) {
 			}
 		};
 
-		return playerDao.getByGuid(guid)
-			.then(rejectPlayerNotFound)
+		return assertPlayer(guid)
 			.then(getGame)
 			.then(checkAlreadyPlaying)
 	};
@@ -57,6 +47,14 @@ var Game = function(gameDao, playerDao) {
 		return {
 			player1: guid
 		};
+	};
+
+	var assertPlayer = function(guid) {
+		var rejectNotFound = function(data) {
+			if (!data) return Promise.reject('Player not found');
+		};
+		return playerDao.getByGuid(guid)
+			.then(rejectNotFound);
 	};
 
 	return api;
