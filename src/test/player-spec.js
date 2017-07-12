@@ -10,25 +10,28 @@ describe('Player', function() {
 	});
 
 	describe('signUp', function() {
+		it('should require a name', function() {
+			expect(player.signUp()).to.eventually.be.rejected;
+			expect(player.signUp('')).to.eventually.be.rejected;
+		});
 
 		it('should provide guid', function() {
-			var guid = player.signUp('Jan');
-			expect(guid.length).to.equal(36);
+			var promise = player.signUp('Jan').then(function (guid) {
+				return guid.length;
+			});
+
+			expect(promise).to.eventually.equal(36);
 		});
 
 		it('should provide a unique guid', function() {
-			var guid1 = player.signUp('Jan');
-			var guid2 = player.signUp('Andy');
+			var diff = Promise.all([
+				player.signUp('Jan'),
+				player.signUp('Andy')
+			]).then(function(results) {
+				return results[0] === results[1];
+			});
 
-			expect(guid1).to.not.equal(guid2);
-		});
-
-		it('should require a name', function() {
-			var callNoArgs = player.signUp.bind(player);
-			expect(callNoArgs).to.throw();
-
-			var callEmptyName = player.signUp.bind(player, '');
-			expect(callEmptyName).to.throw();
+			expect(diff).to.eventually.equal(false);
 		});
 	});
 });

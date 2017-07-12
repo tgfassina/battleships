@@ -5,12 +5,12 @@ var Player = function(dao) {
 	var api = {};
 
 	api.signUp = function(name) {
-		if (!name) throw new Error;
+		if (!name) return Promise.reject();
 		var guid = Guid.raw();
 
-		// dao.save(name, guid);
-
-		return guid;
+		return dao.save(name, guid).then(function(data) {
+			return data['guid'];
+		});
 	};
 
 	return api;

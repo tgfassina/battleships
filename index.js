@@ -4,18 +4,22 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
+app.use(bodyParser.json())
 
 var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 mongoose.connect(config.db.host, {
 	useMongoClient: true
 });
 
 
-app.use(bodyParser.json())
-
-var PlayerRoute = require('./express-routes/player-route.js');
 var PlayerDao = require('./mongo-daos/player-dao.js');
-PlayerRoute(app, PlayerDao(mongoose));
+var Player = require('./src/models/player.js');
+var playerDao = PlayerDao(mongoose);
+
+var player = Player(playerDao);
+var PlayerRoute = require('./express-routes/player-route.js');
+PlayerRoute(app, player);
 
 
 app.use(function (err, req, res, next) {

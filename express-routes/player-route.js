@@ -1,13 +1,10 @@
-PlayerRoute = function(app, playerDao) {
-
-	var Player = require('../src/models/player.js');
-	var player = Player(playerDao);
+PlayerRoute = function(app, player) {
 
 	app.post('/player/signup', function (req, res) {
-		var token = player.signUp(req.body.name);
-
-		res.send({
-			token: token
+		player.signUp(req.body.name).then(function(guid) {
+			res.send({guid: guid});
+		}).catch(function() {
+			res.status(500).send('Nope!');
 		});
 	});
 };
