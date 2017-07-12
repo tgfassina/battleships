@@ -14,15 +14,17 @@ mongoose.connect(config.db.host, {
 
 
 var PlayerDao = require('./mongo-daos/player-dao.js');
-var Player = require('./src/models/player.js');
 var playerDao = PlayerDao(mongoose);
+var Player = require('./src/models/player.js');
 
 var player = Player(playerDao);
 var PlayerRoute = require('./express-routes/player-route.js');
 PlayerRoute(app, player);
 
+var GameDao = require('./mongo-daos/game-dao.js');
+var gameDao = GameDao(mongoose);
 var Game = require('./src/models/game.js');
-var game = Game(playerDao);
+var game = Game(gameDao, playerDao);
 var GameRoute = require('./express-routes/game-route.js');
 GameRoute(app, game);
 

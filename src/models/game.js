@@ -1,4 +1,4 @@
-var Game = function(playerDao) {
+var Game = function(gameDao, playerDao) {
 
 	var api = {};
 
@@ -10,13 +10,17 @@ var Game = function(playerDao) {
 		};
 
 		var createGame = function() {
-			var gameId = '0123456789'+'0123456789'+'0123';
-			return Promise.resolve(gameId);
+			return gameDao.save({});
 		};
 
-		return playerDao.findByGuid(guid)
+		var returnGameId = function(gameData) {
+			return gameData['_id'];
+		};
+
+		return playerDao.getByGuid(guid)
 			.then(rejectNotFound)
-			.then(createGame);
+			.then(createGame)
+			.then(returnGameId);
 	};
 
 	api.join = function(guid, gameId) {
@@ -27,15 +31,14 @@ var Game = function(playerDao) {
 		};
 
 		var getGame = function() {
-			return Promise.reject('Game not found');
-			// return gameDao.getById(gameId);
+			return gameDao.getById(gameId);
 		};
 
 		var checkAlreadyPlaying = function(gameData) {
 			return Promise.reject('Already playing this game');
 		};
 
-		return playerDao.findByGuid(guid)
+		return playerDao.getByGuid(guid)
 			.then(rejectPlayerNotFound)
 			.then(getGame)
 			.then(checkAlreadyPlaying)

@@ -15,7 +15,7 @@ fake.save = function(name, guid) {
 	});
 };
 
-fake.findByGuid = function(guid) {
+fake.getByGuid = function(guid) {
 	var player = _.find(fake.data, function(p) {
 		return p.guid === guid;
 	});

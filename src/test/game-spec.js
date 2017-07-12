@@ -3,13 +3,14 @@ describe('Game', function() {
 	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
 
+	var gameDaoFake = require('./fakes/game-dao-fake.js');
 	var playerDaoFake = require('./fakes/player-dao-fake.js');
 
 	var game;
 	var player;
 
 	beforeEach(function() {
-		game = Game(playerDaoFake);
+		game = Game(gameDaoFake, playerDaoFake);
 		player = Player(playerDaoFake);
 	});
 

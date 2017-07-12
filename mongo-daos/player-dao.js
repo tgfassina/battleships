@@ -18,7 +18,7 @@ var PlayerDao = function(mongoose) {
 		return player.save();
 	};
 
-	api.findByGuid = function(guid) {
+	api.getByGuid = function(guid) {
 		return Model.findOne({guid: guid});
 	};
 
