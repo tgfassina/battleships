@@ -1,9 +1,9 @@
-GameRoute = function(app, game) {
+LobbyRoute = function(app, game) {
 
-	app.post('/game/create', function (req, res) {
+	app.post('/lobby/create', function (req, res) {
 		game.create(req.body.guid).then(function(gameId) {
 			res.send({
-				message: 'Game created',
+				message: 'Lobby created',
 				gameId: gameId
 			});
 		}).catch(function(msg) {
@@ -11,10 +11,10 @@ GameRoute = function(app, game) {
 		});
 	});
 
-	app.post('/game/join', function(req, res) {
+	app.post('/lobby/join', function(req, res) {
 		game.join(req.body.guid, req.body.gameId).then(function() {
 			res.send({
-				message: 'Joined game'
+				message: 'Lobby joined'
 			});
 		}).catch(function(msg) {
 			res.status(500).send(msg);
@@ -22,4 +22,4 @@ GameRoute = function(app, game) {
 	});
 };
 
-module.exports = GameRoute;
+module.exports = LobbyRoute;

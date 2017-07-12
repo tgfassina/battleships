@@ -16,17 +16,19 @@ mongoose.connect(config.db.host, {
 var PlayerDao = require('./mongo-daos/player-dao.js');
 var playerDao = PlayerDao(mongoose);
 var Player = require('./src/models/player.js');
-
 var player = Player(playerDao);
-var PlayerRoute = require('./express-routes/player-route.js');
-PlayerRoute(app, player);
 
 var GameDao = require('./mongo-daos/game-dao.js');
 var gameDao = GameDao(mongoose);
 var Game = require('./src/models/game.js');
 var game = Game(gameDao, playerDao);
-var GameRoute = require('./express-routes/game-route.js');
-GameRoute(app, game);
+
+
+var PlayerRoute = require('./express-routes/player-route.js');
+PlayerRoute(app, player);
+
+var LobbyRoute = require('./express-routes/lobby-route.js');
+LobbyRoute(app, game);
 
 
 app.use(function (err, req, res, next) {
