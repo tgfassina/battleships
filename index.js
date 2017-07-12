@@ -32,6 +32,9 @@ PlayerRoute(app, player);
 var LobbyRoute = require('./express-routes/lobby-route.js');
 LobbyRoute(app, game);
 
+var GameRoute = require('./express-routes/game-route.js');
+GameRoute(app, game);
+
 
 // Boot webserver
 app.use(function (err, req, res, next) {
