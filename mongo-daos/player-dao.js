@@ -19,7 +19,12 @@ var PlayerDao = function(mongoose) {
 	};
 
 	api.getByGuid = function(guid) {
-		return Model.findOne({guid: guid});
+		var assertExists = function(data) {
+			if (!data) return Promise.reject('Player not found');
+			return data;
+		};
+
+		return Model.findOne({guid: guid}).then(assertExists);
 	};
 
 	return api;

@@ -20,7 +20,9 @@ fake.getByGuid = function(guid) {
 		return p.guid === guid;
 	});
 
-	return Promise.resolve(player || null);
+	return player ?
+		Promise.resolve(player) :
+		Promise.reject('Player not found');
 };
 
 module.exports = fake;
