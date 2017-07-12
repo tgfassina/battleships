@@ -3,9 +3,8 @@ var Game = function(gameDao, playerDao) {
 	var api = {};
 
 	api.create = function(guid) {
-		if (!guid) return Promise.reject('Player not found');
 
-		var rejectNotFound = function(data) {
+		var rejectPlayerNotFound = function(data) {
 			if (!data) return Promise.reject('Player not found');
 		};
 
@@ -19,13 +18,12 @@ var Game = function(gameDao, playerDao) {
 		};
 
 		return playerDao.getByGuid(guid)
-			.then(rejectNotFound)
+			.then(rejectPlayerNotFound)
 			.then(createGame)
 			.then(returnGameId);
 	};
 
 	api.join = function(guid, gameId) {
-		if (!guid) return Promise.reject('Player not found');
 
 		var rejectPlayerNotFound = function(data) {
 			if (!data) return Promise.reject('Player not found');

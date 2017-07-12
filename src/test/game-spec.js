@@ -16,13 +16,8 @@ describe('Game', function() {
 
 	describe('create', function() {
 		it('should require existing player guid', function() {
-			var noGuid = game.create();
-			var invalidGuid = game.create('0000');
-
-			return Promise.all([
-				expect(noGuid).to.be.rejectedWith('Player not found'),
-				expect(invalidGuid).to.be.rejectedWith('Player not found')
-			]);
+			var badCreate = game.create('0000');
+			expect(badCreate).to.be.rejectedWith('Player not found');
 		});
 
 		it('should provide game id', function() {
@@ -43,16 +38,6 @@ describe('Game', function() {
 	});
 
 	describe('join', function() {
-		it('should require existing player guid', function() {
-			var noGuid = game.join();
-			var invalidGuid = game.join('0000');
-
-			return Promise.all([
-				expect(noGuid).to.be.rejectedWith('Player not found'),
-				expect(invalidGuid).to.be.rejectedWith('Player not found')
-			]);
-		});
-
 		it('should require existing game', function() {
 			var _joinAttempt;
 

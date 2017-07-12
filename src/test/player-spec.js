@@ -11,13 +11,8 @@ describe('Player', function() {
 
 	describe('signUp', function() {
 		it('should require a name', function() {
-			var noName = player.signUp();
-			var emptyName = player.signUp('');
-
-			return Promise.all([
-				expect(noName).to.be.rejectedWith('Failed to provide name'),
-				expect(emptyName).to.be.rejectedWith('Failed to provide name')
-			]);
+			var badSignUp = player.signUp('');
+			return expect(badSignUp).to.be.rejectedWith('Failed to provide name');
 		});
 
 		it('should provide guid', function() {
