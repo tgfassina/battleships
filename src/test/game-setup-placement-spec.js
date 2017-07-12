@@ -26,7 +26,7 @@ describe('Game setup: placement phase', function() {
 
 
 			var signUp = function() {
-				return player.signUp('Bob').then(function(guid) {
+				return player.signUp('Jan').then(function(guid) {
 					return _guid = guid;
 				});
 			};
