@@ -22,6 +22,10 @@ var Game = function(playerDao) {
 		});
 	};
 
+	api.place = function() {
+		return Promise.reject('Invalid ship');
+	};
+
 	return api;
 };
 
