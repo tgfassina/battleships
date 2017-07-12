@@ -7,6 +7,14 @@ GameRoute = function(app, game) {
 			res.status(500).send(msg);
 		});
 	});
+
+	app.post('/game/join', function(req, res) {
+		game.join(req.body.guid, req.body.gameId).then(function() {
+			res.send({message: 'Joined game'});
+		}).catch(function(msg) {
+			res.status(500).send(msg);
+		});
+	});
 };
 
 module.exports = GameRoute;
