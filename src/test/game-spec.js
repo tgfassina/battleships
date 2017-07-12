@@ -15,27 +15,35 @@ describe('Game', function() {
 
 	describe('create', function() {
 		it('should require existing player guid', function() {
-			expect(game.create())
-				.to.eventually.be.rejectedWith('Failed to provide guid');
-			expect(game.create('0000'))
-				.to.eventually.be.rejectedWith('Invalid guid');
+			var noGuid = game.create();
+			var invalidGuid = game.create('0000');
+
+			return Promise.all([
+				expect(noGuid).to.eventually.be.rejectedWith('Failed to provide guid'),
+				expect(invalidGuid).to.eventually.be.rejectedWith('Invalid guid')
+			]);
 		});
 
 		it('should provide game id', function() {
-			player.signUp('Jan').then(function(guid) {
-				game.create(guid).then(function(gameId) {
-					expect(gameId.length).to.equal(24);
+			var promise = player.signUp('Jan').then(function(guid) {
+				return game.create(guid).then(function(gameId) {
+					return gameId.length;
 				});
 			});
+
+			return expect(promise).to.eventually.equal(24);
 		});
 	});
 
 	describe('join', function() {
 		it('should require existing player guid', function() {
-			expect(game.join())
-				.to.eventually.be.rejectedWith('Failed to provide guid');
-			expect(game.join('0000'))
-				.to.eventually.be.rejectedWith('Invalid guid');
+			var noGuid = game.join();
+			var invalidGuid = game.join('0000');
+
+			return Promise.all([
+				expect(noGuid).to.eventually.be.rejectedWith('Failed to provide guid'),
+				expect(invalidGuid).to.eventually.be.rejectedWith('Invalid guid')
+			]);
 		});
 
 		it('should require a player who is not in game', function() {
@@ -45,7 +53,8 @@ describe('Game', function() {
 				});
 			});
 
-			expect(promise).to.eventually.be.rejectedWith('Already playing this game');
+			return expect(promise)
+				.to.eventually.be.rejectedWith('Already playing this game');
 		});
 	});
 });

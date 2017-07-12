@@ -11,11 +11,13 @@ describe('Player', function() {
 
 	describe('signUp', function() {
 		it('should require a name', function() {
-			expect(player.signUp())
-				.to.eventually.be.rejectedWith('Failed to provide name');
+			var noName = player.signUp();
+			var emptyName = player.signUp('');
 
-			expect(player.signUp(''))
-				.to.eventually.be.rejectedWith('Failed to provide name');
+			return Promise.all([
+				expect(noName).to.eventually.be.rejectedWith('Failed to provide name'),
+				expect(emptyName).to.eventually.be.rejectedWith('Failed to provide name')
+			]);
 		});
 
 		it('should provide guid', function() {
@@ -23,7 +25,7 @@ describe('Player', function() {
 				return guid.length;
 			});
 
-			expect(promise).to.eventually.equal(36);
+			return expect(promise).to.eventually.equal(36);
 		});
 
 		it('should provide a unique guid', function() {
@@ -34,7 +36,7 @@ describe('Player', function() {
 				return results[0] === results[1];
 			});
 
-			expect(diff).to.eventually.equal(false);
+			return expect(diff).to.eventually.equal(false);
 		});
 	});
 });
