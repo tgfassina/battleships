@@ -21,6 +21,11 @@ var player = Player(playerDao);
 var PlayerRoute = require('./express-routes/player-route.js');
 PlayerRoute(app, player);
 
+var Game = require('./src/models/game.js');
+var game = Game(playerDao);
+var GameRoute = require('./express-routes/game-route.js');
+GameRoute(app, game);
+
 
 app.use(function (err, req, res, next) {
 	console.error(err.stack);
