@@ -51,6 +51,10 @@ var Game = function(gameDao, playerDao) {
 		return Promise.reject('Invalid ship');
 	};
 
+	api.ready = function() {
+		return Promise.reject('Must place all ships');
+	};
+
 	var initGame = function(guid) {
 		return {
 			player1: guid
