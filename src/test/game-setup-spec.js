@@ -14,10 +14,17 @@ describe('Game setup', function() {
 		player = Player(playerDaoFake);
 	});
 
-	describe('ready', function() {
-		it('should require all ships to be placed', function() {
+	describe('place', function() {
+		it('should validate ship type', function() {
+
+			var _gameId;
 			var _guid;
-			var _readyAttempt;
+			var _placement1;
+			var _placement2;
+
+			var position1 = {ship: 0, x: 0, y: 0, r: 1};
+			var position2 = {ship: 6, x: 0, y: 0, r: 1};
+
 
 			var signUp = function() {
 				return player.signUp('Jan').then(function(guid) {
@@ -26,55 +33,26 @@ describe('Game setup', function() {
 			};
 
 			var createGame = function(guid) {
-				return game.create(guid);
+				return game.create(guid).then(function(gameId) {
+					return _gameId = gameId;
+				});
 			};
 
-			var readyUp = function(gameId) {
-				_readyAttempt = game.ready(_guid, gameId);
+			var placeShips = function() {
+				_placement1 = game.place(_guid, _gameId, position1);
+				_placement2 = game.place(_guid, _gameId, position2);
 			};
 
 			var assert = function() {
-				return expect(_readyAttempt)
-					.to.be.rejectedWith('Must place all ships');
+				return Promise.all([
+					expect(_placement1).to.be.rejectedWith('Invalid ship'),
+					expect(_placement2).to.be.rejectedWith('Invalid ship')
+				]);
 			};
 
 			return signUp()
 				.then(createGame)
-				.then(readyUp)
-				.then(assert);
-		});
-
-		it('should require the player to be in the game', function() {
-			var _andysGuid;
-			var _readyAttempt;
-
-			var playersSignUp = function() {
-				return Promise.all([
-					player.signUp('Jan'),
-					player.signUp('Andy')
-				])
-				.then(function(guids) {
-					_andysGuid = guids[1];
-					return guids[0];
-				});
-			};
-
-			var janCreatesGame = function(jansGuid) {
-				return game.create(jansGuid);
-			};
-
-			var andyGetsReady = function(gameId) {
-				_readyAttempt = game.ready(_andysGuid, gameId);
-			};
-
-			var assert = function() {
-				return expect(_readyAttempt)
-					.to.be.rejectedWith('Player is not in game');
-			};
-
-			return playersSignUp()
-				.then(janCreatesGame)
-				.then(andyGetsReady)
+				.then(placeShips)
 				.then(assert);
 		});
 	});

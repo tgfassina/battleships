@@ -65,6 +65,7 @@ var Game = function(gameDao, playerDao) {
 			.then(assertShipsArePlaced);
 	};
 
+
 	var initGame = function(guid) {
 		return {
 			player1: guid
