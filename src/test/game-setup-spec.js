@@ -16,9 +16,8 @@ describe('Game setup', function() {
 
 	describe('place', function() {
 		it('should validate ship type', function() {
-			var position1 = {ship: 0, x: 0, y: 0, r: 1};
-			var position2 = {ship: 6, x: 0, y: 0, r: 1};
-
+			var ship1 = {ship: 0, x: 0, y: 0, r: 1};
+			var ship2 = {ship: 6, x: 0, y: 0, r: 1};
 
 			var signUp = function() {
 				return player.signUp('Jan');
@@ -32,8 +31,8 @@ describe('Game setup', function() {
 
 			var placeShips = function(state) {
 				return {
-					p1: game.place(state.guid, state.gameId, position1),
-					p2: game.place(state.guid, state.gameId, position2)
+					p1: game.place(state.guid, state.gameId, ship1),
+					p2: game.place(state.guid, state.gameId, ship2)
 				};
 			};
 
@@ -41,6 +40,49 @@ describe('Game setup', function() {
 				return Promise.all([
 					expect(placements.p1).to.be.rejectedWith('Invalid ship'),
 					expect(placements.p2).to.be.rejectedWith('Invalid ship')
+				]);
+			};
+
+			return signUp()
+				.then(createGame)
+				.then(placeShips)
+				.then(assert);
+		});
+
+		it('should inform placed ship names', function() {
+			var ship1 = {ship: 1, x: 0, y: 0, r: 2};
+			var ship2 = {ship: 2, x: 0, y: 1, r: 2};
+			var ship3 = {ship: 3, x: 0, y: 2, r: 2};
+			var ship4 = {ship: 4, x: 0, y: 3, r: 2};
+			var ship5 = {ship: 5, x: 0, y: 4, r: 2};
+
+			var signUp = function() {
+				return player.signUp('Jan');
+			};
+
+			var createGame = function(guid) {
+				return game.create(guid).then(function(gameId) {
+					return {guid: guid, gameId: gameId};
+				});
+			};
+
+			var placeShips = function(state) {
+				return {
+					p1: game.place(state.guid, state.gameId, ship1),
+					p2: game.place(state.guid, state.gameId, ship2),
+					p3: game.place(state.guid, state.gameId, ship3),
+					p4: game.place(state.guid, state.gameId, ship4),
+					p5: game.place(state.guid, state.gameId, ship5)
+				};
+			};
+
+			var assert = function(placements) {
+				return Promise.all([
+					expect(placements.p1).to.eventually.equal('Carrier'),
+					expect(placements.p2).to.eventually.equal('Battleship'),
+					expect(placements.p3).to.eventually.equal('Cruiser'),
+					expect(placements.p4).to.eventually.equal('Submarine'),
+					expect(placements.p5).to.eventually.equal('Destroyer')
 				]);
 			};
 

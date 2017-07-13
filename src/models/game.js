@@ -35,8 +35,29 @@ var Game = function(gameDao, playerDao) {
 			.then(checkAlreadyPlaying)
 	};
 
-	api.place = function() {
-		return Promise.reject('Invalid ship');
+	api.place = function(guid, gameId, ship) {
+
+		var assertValidShip = function() {
+			if (ship.ship < 1 || ship.ship > 5) {
+				return Promise.reject('Invalid ship');
+			}
+		};
+
+		var placeShip = function() {
+			var shipNames = [
+				'',
+				'Carrier',
+				'Battleship',
+				'Cruiser',
+				'Submarine',
+				'Destroyer'
+			];
+			return shipNames[ship.ship];
+		};
+
+		return assertPlayerInGame(guid, gameId)
+			.then(assertValidShip)
+			.then(placeShip);
 	};
 
 	api.ready = function(guid, gameId) {
@@ -50,6 +71,7 @@ var Game = function(gameDao, playerDao) {
 	};
 
 	api.shoot = function(guid, gameId) {
+
 		var assertGameStarted = function() {
 			return Promise.reject('Game not started yet');
 		};
