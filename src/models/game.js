@@ -69,6 +69,7 @@ var Game = function(gameDao, playerDao) {
 
 			var collision = false
 			_.forEach(gameData.board[player], function(placedShip) {
+				if (!placedShip) return;
 				if (ship.x === placedShip.x && ship.y === placedShip.y) {
 					collision = true;
 				}
@@ -136,9 +137,10 @@ var Game = function(gameDao, playerDao) {
 	var initGame = function(guid) {
 		return {
 			player1: guid,
+			player2: null,
 			board: {
-				p1: {1: false, 2: false, 3: false, 4: false, 5: false},
-				p2: {1: false, 2: false, 3: false, 4: false, 5: false}
+				p1: {1: null, 2: null, 3: null, 4: null, 5: null},
+				p2: {1: null, 2: null, 3: null, 4: null, 5: null}
 			}
 		};
 	};

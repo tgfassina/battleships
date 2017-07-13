@@ -1,7 +1,9 @@
 var GameDao = function(mongoose) {
 
 	var Schema = mongoose.Schema({
-		player1: String
+		player1: String,
+		player2: String,
+		board: Object
 	});
 	var Model = mongoose.model('game', Schema);
 
@@ -11,6 +13,10 @@ var GameDao = function(mongoose) {
 	api.save = function(data) {
 		var game = new Model(data);
 		return game.save();
+	};
+
+	api.update = function(data) {
+		return Model.findByIdAndUpdate(data._id, data);
 	};
 
 	api.getById = function(id) {
