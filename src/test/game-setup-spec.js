@@ -16,33 +16,31 @@ describe('Game setup', function() {
 
 	describe('place', function() {
 		it('should validate ship type', function() {
-			var _guid;
-			var _placement1;
-			var _placement2;
-
 			var position1 = {ship: 0, x: 0, y: 0, r: 1};
 			var position2 = {ship: 6, x: 0, y: 0, r: 1};
 
 
 			var signUp = function() {
-				return player.signUp('Jan').then(function(guid) {
-					return _guid = guid;
-				});
+				return player.signUp('Jan');
 			};
 
 			var createGame = function(guid) {
-				return game.create(guid);
+				return game.create(guid).then(function(gameId) {
+					return {guid: guid, gameId: gameId};
+				});
 			};
 
-			var placeShips = function(gameId) {
-				_placement1 = game.place(_guid, gameId, position1);
-				_placement2 = game.place(_guid, gameId, position2);
+			var placeShips = function(state) {
+				return {
+					p1: game.place(state.guid, state.gameId, position1),
+					p2: game.place(state.guid, state.gameId, position2)
+				};
 			};
 
-			var assert = function() {
+			var assert = function(placements) {
 				return Promise.all([
-					expect(_placement1).to.be.rejectedWith('Invalid ship'),
-					expect(_placement2).to.be.rejectedWith('Invalid ship')
+					expect(placements.p1).to.be.rejectedWith('Invalid ship'),
+					expect(placements.p2).to.be.rejectedWith('Invalid ship')
 				]);
 			};
 
