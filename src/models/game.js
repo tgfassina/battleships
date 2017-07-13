@@ -124,11 +124,31 @@ var Game = function(gameDao, playerDao) {
 			var player = getPlayer(gameData, guid);
 			var allPlaced = _.reduce(gameData.board[player], reducer, true);
 
-			return Promise.reject('Must place all ships');
+			if (!allPlaced) {
+				return Promise.reject('Must place all ships');
+			}
+
+			return gameData;
+		};
+
+		var assertGameIsNotStarted = function(gameData) {
+			if (gameData.ready.p1 && gameData.ready.p2) {
+				return Promise.reject('Game already started');
+			}
+			return gameData;
+		};
+
+		var setAsReady = function(gameData) {
+			var player = getPlayer(gameData, guid);
+			gameData.ready[player] = true;
+
+			return gameDao.update(gameData._id, gameData);
 		};
 
 		return assertPlayerInGame(guid, gameId)
-			.then(assertShipsArePlaced);
+			.then(assertShipsArePlaced)
+			.then(assertGameIsNotStarted)
+			.then(setAsReady);
 	};
 
 	api.shoot = function(guid, gameId) {
@@ -146,6 +166,10 @@ var Game = function(gameDao, playerDao) {
 		return {
 			player1: guid,
 			player2: null,
+			ready: {
+				p1: false,
+				p2: false
+			},
 			board: {
 				p1: {1: null, 2: null, 3: null, 4: null, 5: null},
 				p2: {1: null, 2: null, 3: null, 4: null, 5: null}

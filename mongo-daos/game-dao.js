@@ -3,6 +3,10 @@ var GameDao = function(mongoose) {
 	var Schema = mongoose.Schema({
 		player1: String,
 		player2: String,
+		ready: {
+			p1: Boolean,
+			p2: Boolean
+		},
 		board: Object
 	});
 	var Model = mongoose.model('game', Schema);

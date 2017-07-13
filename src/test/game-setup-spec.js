@@ -68,9 +68,18 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
-		xit('should not be allowed after game started', function() {
-			return archetype.forTwoPlayerLobby()
-				.then(playersGetReady)
+		it('should not be allowed after game started', function() {
+			var _alreadyReady;
+
+			var getReadyOnceMore = function(state) {
+				_alreadyReady = game.ready(state.guidP2, state.gameId);
+			};
+
+			var assert = function() {
+				return expect(_alreadyReady).to.be.rejectedWith('Game already started');
+			};
+
+			return archetype.forTwoPlayersLobbyStarted()
 				.then(getReadyOnceMore)
 				.then(assert);
 		});
