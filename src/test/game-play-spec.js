@@ -34,6 +34,23 @@ describe('Gameplay', function() {
 				.then(assert);
 		});
 
+		it('should enforce player1 makes the first move', function() {
+			var _fail;
+
+			var p2Shoots = function(state) {
+				var shot = {x: 0, y: 0};
+				_fail = game.shoot(state.guidP2, state.gameId, shot);
+			};
+
+			var assert = function() {
+				return expect(_fail).to.be.rejectedWith('Not your turn');
+			};
+
+			return archetype.forTwoPlayersLobbyStarted()
+				.then(p2Shoots)
+				.then(assert);
+		});
+
 		it('should be on players turn', function() {
 			var _p1Fail;
 			var _p2Fail;
