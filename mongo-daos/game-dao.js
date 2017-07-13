@@ -7,7 +7,14 @@ var GameDao = function(mongoose) {
 			p1: Boolean,
 			p2: Boolean
 		},
-		board: Object
+		board: {
+			p1: Object,
+			p2: Object
+		},
+		moves: {
+			p1: Array,
+			p2: Array
+		}
 	});
 	var Model = mongoose.model('game', Schema);
 

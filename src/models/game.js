@@ -153,6 +153,26 @@ var Game = function(gameDao, playerDao) {
 
 	api.shoot = function(guid, gameId, shot) {
 
+		var assertPlayerTurn = function(gameData) {
+			var moves = gameData.moves;
+			var hasTheTurn = moves.p1.length > moves.p2.length ? 'p2' : 'p1';
+
+			var player = getPlayer(gameData, guid);
+			if (hasTheTurn != player) {
+				return Promise.reject('Not your turn');
+			}
+
+			return gameData;
+		};
+
+		var saveShot = function(gameData) {
+			var player = getPlayer(gameData, guid);
+			gameData.moves[player].push(shot);
+			return gameDao.update(gameData._id, gameData).then(function() {
+				return gameData;
+			});
+		};
+
 		var returnShotResult = function(gameData) {
 			var hit = false;
 			var enemy = getEnemy(gameData, guid);
@@ -167,6 +187,8 @@ var Game = function(gameDao, playerDao) {
 		};
 
 		return assertPlaying(guid, gameId)
+			.then(assertPlayerTurn)
+			.then(saveShot)
 			.then(returnShotResult);
 	};
 
@@ -182,6 +204,10 @@ var Game = function(gameDao, playerDao) {
 			board: {
 				p1: {1: null, 2: null, 3: null, 4: null, 5: null},
 				p2: {1: null, 2: null, 3: null, 4: null, 5: null}
+			},
+			moves: {
+				p1: [],
+				p2: []
 			}
 		};
 	};
