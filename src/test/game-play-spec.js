@@ -1,4 +1,4 @@
-describe('Game setup', function() {
+describe('Gameplay', function() {
 
 	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
@@ -42,7 +42,7 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
-		xit('should inform if it was hit or miss', function() {
+		it('should inform if it was hit or miss', function() {
 			var _badShot;
 			var _goodShot;
 
@@ -99,25 +99,29 @@ describe('Game setup', function() {
 
 			var playersReady = function(state) {
 				return Promise.all([
-					game.ready(state.guidJan),
-					game.ready(state.guidAndy)
-				]);
+					game.ready(state.guidJan, state.gameId),
+					game.ready(state.guidAndy, state.gameId)
+				]).then(function() {
+					return state;
+				});
 			};
 
 			var missShot = function(state) {
 				var shot = {x: 9, y: 9};
 				_badShot = game.shoot(state.guidJan, state.gameId, shot);
+				return state;
 			};
 
 			var hitShot = function(state) {
 				var shot = {x: 0, y: 0};
 				_goodShot = game.shoot(state.guidAndy, state.gameId, shot);
+				return state;
 			};
 
 			var assert = function() {
 				return Promise.all([
-					expect(_badShot).to.equal({hit: false}),
-					expect(_goodShot).to.equal({hit: true})
+					expect(_badShot).to.eventually.equal({hit: false}),
+					expect(_goodShot).to.eventually.equal({hit: true})
 				]);
 			};
 

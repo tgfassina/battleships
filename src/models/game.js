@@ -116,7 +116,17 @@ var Game = function(gameDao, playerDao) {
 	api.ready = function(guid, gameId) {
 
 		var assertShipsArePlaced = function(gameData) {
-			return Promise.reject('Must place all ships');
+
+			var reducer = function(carry, placement) {
+				return placement && carry;
+			};
+
+			var player = getPlayer(gameData, guid);
+			var allPlaced = _.reduce(gameData.board[player], reducer, true);
+
+			if (!allPlaced) {
+				return Promise.reject('Must place all ships');
+			}
 		};
 
 		return assertPlayerInGame(guid, gameId)
