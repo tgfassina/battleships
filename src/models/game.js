@@ -13,7 +13,7 @@ var Game = function(gameDao, playerDao) {
 			return gameData['_id'];
 		};
 
-		return assertPlayer(guid)
+		return assertPlayerExists(guid)
 			.then(createGame)
 			.then(returnGameId);
 	};
@@ -30,7 +30,7 @@ var Game = function(gameDao, playerDao) {
 			}
 		};
 
-		return assertPlayer(guid)
+		return assertPlayerExists(guid)
 			.then(getGame)
 			.then(checkAlreadyPlaying)
 	};
@@ -41,32 +41,16 @@ var Game = function(gameDao, playerDao) {
 
 	api.ready = function(guid, gameId) {
 
-		var getGame = function() {
-			return gameDao.getById(gameId);
-		};
-
-		var assertPlayerInGame = function(gameData) {
-			var isPlayer1 = gameData.player1 === guid;
-			var isPlayer2 = gameData.player2 === guid;
-
-			if (!isPlayer1 && !isPlayer2) {
-				return Promise.reject('Player is not in game');
-			}
-
-			return gameData;
-		};
-
 		var assertShipsArePlaced = function(gameData) {
 			return Promise.reject('Must place all ships');
 		};
 
-		return getGame(gameId)
-			.then(assertPlayerInGame)
+		return assertPlayerInGame(guid, gameId)
 			.then(assertShipsArePlaced);
 	};
 
 	api.shoot = function() {
-		return Promise.reject('Game not started yet');
+		return Promise.reject()
 	};
 
 
@@ -76,12 +60,27 @@ var Game = function(gameDao, playerDao) {
 		};
 	};
 
-	var assertPlayer = function(guid) {
+	var assertPlayerExists = function(guid) {
 		var rejectNotFound = function(data) {
 			if (!data) return Promise.reject('Player not found');
 		};
 		return playerDao.getByGuid(guid)
 			.then(rejectNotFound);
+	};
+
+	var assertPlayerInGame = function(guid, gameId) {
+		var assert = function(gameData) {
+			var isPlayer1 = gameData.player1 === guid;
+			var isPlayer2 = gameData.player2 === guid;
+
+			if (!isPlayer1 && !isPlayer2) {
+				return Promise.reject('Player is not in game');
+			}
+
+			return gameData;
+		}
+
+		return gameDao.getById(gameId).then(assert);
 	};
 
 	return api;
