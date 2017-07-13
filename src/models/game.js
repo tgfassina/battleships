@@ -30,11 +30,28 @@ var Game = function(gameDao, playerDao) {
 			if (gameData.player1 === guid) {
 				return Promise.reject('Already playing this game');
 			}
+			return gameData;
+		};
+
+		var assertSlotIsAvailable = function(gameData) {
+			if (gameData.player2) {
+				return Promise.reject('Lobby is full');
+			}
+			return gameData;
+		};
+
+		var joinLobby = function(gameData) {
+			gameData.player2 = guid;
+			return gameDao.update(gameData._id, gameData).then(function() {
+				return 'Lobby joined';
+			});
 		};
 
 		return assertPlayerExists(guid)
 			.then(getGame)
 			.then(checkAlreadyPlaying)
+			.then(assertSlotIsAvailable)
+			.then(joinLobby);
 	};
 
 	api.place = function(guid, gameId, ship) {
