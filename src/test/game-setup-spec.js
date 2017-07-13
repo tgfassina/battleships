@@ -16,8 +16,8 @@ describe('Game setup', function() {
 
 	describe('place', function() {
 		it('should validate ship type', function() {
-			var ship1 = {ship: 0, x: 0, y: 0, r: 1};
-			var ship2 = {ship: 6, x: 0, y: 0, r: 1};
+			var ship1 = {ship: 0, x: 0, y: 0, r: 2};
+			var ship2 = {ship: 6, x: 0, y: 0, r: 2};
 
 			var signUp = function() {
 				return player.signUp('Jan');
@@ -49,7 +49,45 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
-		it('should inform placed ship names', function() {
+		it('should not allow ships be placed on the same tile', function() {
+			var _collision;
+
+			var ship1 = {ship: 1, x: 0, y: 0, r: 2};
+			var ship2 = {ship: 2, x: 0, y: 0, r: 2};
+
+			var signUp = function() {
+				return player.signUp('Jan');
+			};
+
+			var createGame = function(guid) {
+				return game.create(guid).then(function(gameId) {
+					return {guid: guid, gameId: gameId};
+				});
+			};
+
+			var placeCarrier = function(state) {
+				return game.place(state.guid, state.gameId, ship1).then(function() {
+					return state;
+				});
+			};
+
+			var placeBattleship = function(state) {
+				_collision = game.place(state.guid, state.gameId, ship2);
+			};
+
+			var assert = function() {
+				return expect(_collision)
+					.to.be.rejectedWith('Ships cannot collide');
+			};
+
+			return signUp()
+				.then(createGame)
+				.then(placeCarrier)
+				.then(placeBattleship)
+				.then(assert);
+		});
+
+		it('should inform ship name when successfully placed', function() {
 			var ship1 = {ship: 1, x: 0, y: 0, r: 2};
 			var ship2 = {ship: 2, x: 0, y: 1, r: 2};
 			var ship3 = {ship: 3, x: 0, y: 2, r: 2};

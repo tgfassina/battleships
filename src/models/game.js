@@ -1,3 +1,5 @@
+_ = require('lodash');
+
 var Game = function(gameDao, playerDao) {
 
 	var api = {};
@@ -37,13 +39,44 @@ var Game = function(gameDao, playerDao) {
 
 	api.place = function(guid, gameId, ship) {
 
-		var assertValidShip = function() {
+		var assertValidShip = function(gameData) {
 			if (ship.ship < 1 || ship.ship > 5) {
 				return Promise.reject('Invalid ship');
 			}
+
+			return gameData
 		};
 
-		var placeShip = function() {
+		var assertNoCollision = function(gameData) {
+			var player = getPlayer(gameData, guid);
+
+			var collision = false
+			_.forEach(gameData.board[player], function(placedShip) {
+				if (ship.x === placedShip.x && ship.y === placedShip.y) {
+					collision = true;
+				}
+			});
+
+			if (collision) {
+				return Promise.reject('Ships cannot collide');
+			}
+
+			return gameData;
+		};
+
+		var placeShip = function(gameData) {
+			var player = getPlayer(gameData, guid);
+
+			gameData.board[player][ship.ship] = {
+				x: ship.x,
+				y: ship.y,
+				r: ship.r
+			};
+
+			return gameDao.update(gameData._id, gameData);
+		};
+
+		var returnName = function() {
 			var shipNames = [
 				'',
 				'Carrier',
@@ -57,7 +90,9 @@ var Game = function(gameDao, playerDao) {
 
 		return assertPlayerInGame(guid, gameId)
 			.then(assertValidShip)
-			.then(placeShip);
+			.then(assertNoCollision)
+			.then(placeShip)
+			.then(returnName);
 	};
 
 	api.ready = function(guid, gameId) {
@@ -83,7 +118,11 @@ var Game = function(gameDao, playerDao) {
 
 	var initGame = function(guid) {
 		return {
-			player1: guid
+			player1: guid,
+			board: {
+				p1: {1: false, 2: false, 3: false, 4: false, 5: false},
+				p2: {1: false, 2: false, 3: false, 4: false, 5: false}
+			}
 		};
 	};
 
@@ -108,6 +147,18 @@ var Game = function(gameDao, playerDao) {
 		}
 
 		return gameDao.getById(gameId).then(assert);
+	};
+
+	var getPlayer = function(gameData, guid) {
+		if (gameData.player1 === guid) {
+			return 'p1';
+		}
+
+		if (gameData.player2 === guid) {
+			return 'p2';
+		}
+
+		return null;
 	};
 
 	return api;
