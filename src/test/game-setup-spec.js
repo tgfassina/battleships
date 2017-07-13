@@ -16,8 +16,6 @@ describe('Game setup', function() {
 
 	describe('place', function() {
 		it('should validate ship type', function() {
-
-			var _gameId;
 			var _guid;
 			var _placement1;
 			var _placement2;
@@ -33,14 +31,12 @@ describe('Game setup', function() {
 			};
 
 			var createGame = function(guid) {
-				return game.create(guid).then(function(gameId) {
-					return _gameId = gameId;
-				});
+				return game.create(guid);
 			};
 
-			var placeShips = function() {
-				_placement1 = game.place(_guid, _gameId, position1);
-				_placement2 = game.place(_guid, _gameId, position2);
+			var placeShips = function(gameId) {
+				_placement1 = game.place(_guid, gameId, position1);
+				_placement2 = game.place(_guid, gameId, position2);
 			};
 
 			var assert = function() {
