@@ -15,8 +15,8 @@ var GameDao = function(mongoose) {
 		return game.save();
 	};
 
-	api.update = function(data) {
-		return Model.findByIdAndUpdate(data._id, data);
+	api.update = function(id, data) {
+		return Model.findByIdAndUpdate(id, data);
 	};
 
 	api.getById = function(id) {
