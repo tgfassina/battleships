@@ -3,41 +3,33 @@ describe('Gameplay', function() {
 	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
 
+	var Archetype = require('./artifacts/archetype.js');
 	var gameDaoFake = require('./artifacts/game-dao-fake.js');
 	var playerDaoFake = require('./artifacts/player-dao-fake.js');
 
+	var archetype;
 	var game;
 	var player;
 
 	beforeEach(function() {
 		game = Game(gameDaoFake, playerDaoFake);
 		player = Player(playerDaoFake);
+		archetype = Archetype(player, game);
 	});
 
 	describe('shoot', function() {
 		it('should assert game started', function() {
 			var _shot;
 
-			var signUp = function() {
-				return player.signUp('Jan').then(function(guid) {
-					return _guid = guid;
-				});
-			};
-
-			var createGame = function(guid) {
-				return game.create(guid);
-			};
-
-			var shoot = function(gameId) {
-				_shot = game.shoot(_guid, gameId, 0, 0);
+			var shoot = function(state) {
+				_shot = game.shoot(state.guidP1, state.gameId, 0, 0);
 			};
 
 			var assert = function() {
 				return expect(_shot).to.be.rejectedWith('Game not started yet');
 			};
 
-			return signUp()
-				.then(createGame)
+			return archetype.forSinglePlayerLobby()
 				.then(shoot)
 				.then(assert);
 		});

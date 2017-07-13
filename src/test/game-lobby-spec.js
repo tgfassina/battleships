@@ -3,15 +3,18 @@ describe('Game lobby', function() {
 	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
 
+	var Archetype = require('./artifacts/archetype.js');
 	var gameDaoFake = require('./artifacts/game-dao-fake.js');
 	var playerDaoFake = require('./artifacts/player-dao-fake.js');
 
+	var archetype;
 	var game;
 	var player;
 
 	beforeEach(function() {
 		game = Game(gameDaoFake, playerDaoFake);
 		player = Player(playerDaoFake);
+		archetype = Archetype(player, game);
 	});
 
 	describe('create', function() {
@@ -21,19 +24,12 @@ describe('Game lobby', function() {
 		});
 
 		it('should provide game id', function() {
-			var signUp = function() {
-				return player.signUp('Jan');
+
+			var assert = function(state) {
+				expect(state.gameId.length).to.equal(24);
 			};
 
-			var createGame = function(guid) {
-				return game.create(guid);
-			};
-
-			var assert = function(gameId) {
-				expect(gameId.length).to.equal(24);
-			};
-
-			return signUp().then(createGame).then(assert);
+			return archetype.forSinglePlayerLobby().then(assert);
 		});
 	});
 
@@ -59,29 +55,17 @@ describe('Game lobby', function() {
 		});
 
 		it('should require a player who is not in game', function() {
-			var _guid;
 			var _joinAttempt;
 
-			var signUp = function() {
-				return player.signUp('Jan').then(function(guid) {
-					return _guid = guid;
-				});
-			};
-
-			var createGame = function(guid) {
-				return game.create(guid);
-			};
-
-			var joinGame = function(gameId) {
-				_joinAttempt = game.join(_guid, gameId);
+			var joinGame = function(state) {
+				_joinAttempt = game.join(state.guidP1, state.gameId);
 			};
 
 			var assert = function() {
 				return expect(_joinAttempt).to.be.rejectedWith('Already playing this game');
 			};
 
-			return signUp()
-				.then(createGame)
+			return archetype.forSinglePlayerLobby()
 				.then(joinGame)
 				.then(assert);
 		});
@@ -134,21 +118,10 @@ describe('Game lobby', function() {
 
 	describe('ready', function() {
 		it('should require all ships to be placed', function() {
-			var _guid;
 			var _readyAttempt;
 
-			var signUp = function() {
-				return player.signUp('Jan').then(function(guid) {
-					return _guid = guid;
-				});
-			};
-
-			var createGame = function(guid) {
-				return game.create(guid);
-			};
-
-			var readyUp = function(gameId) {
-				_readyAttempt = game.ready(_guid, gameId);
+			var readyUp = function(state) {
+				_readyAttempt = game.ready(state.guidP1, state.gameId);
 			};
 
 			var assert = function() {
@@ -156,8 +129,7 @@ describe('Game lobby', function() {
 					.to.be.rejectedWith('Must place all ships');
 			};
 
-			return signUp()
-				.then(createGame)
+			return archetype.forSinglePlayerLobby()
 				.then(readyUp)
 				.then(assert);
 		});

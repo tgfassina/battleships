@@ -3,15 +3,18 @@ describe('Game setup', function() {
 	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
 
+	var Archetype = require('./artifacts/archetype.js');
 	var gameDaoFake = require('./artifacts/game-dao-fake.js');
 	var playerDaoFake = require('./artifacts/player-dao-fake.js');
 
+	var archetype;
 	var game;
 	var player;
 
 	beforeEach(function() {
 		game = Game(gameDaoFake, playerDaoFake);
 		player = Player(playerDaoFake);
+		archetype = Archetype(player, game);
 	});
 
 	describe('place', function() {
@@ -19,20 +22,10 @@ describe('Game setup', function() {
 			var ship1 = {ship: 0, x: 0, y: 0, r: 2};
 			var ship2 = {ship: 6, x: 0, y: 0, r: 2};
 
-			var signUp = function() {
-				return player.signUp('Jan');
-			};
-
-			var createGame = function(guid) {
-				return game.create(guid).then(function(gameId) {
-					return {guid: guid, gameId: gameId};
-				});
-			};
-
 			var placeShips = function(state) {
 				return {
-					p1: game.place(state.guid, state.gameId, ship1),
-					p2: game.place(state.guid, state.gameId, ship2)
+					p1: game.place(state.guidP1, state.gameId, ship1),
+					p2: game.place(state.guidP1, state.gameId, ship2)
 				};
 			};
 
@@ -43,8 +36,7 @@ describe('Game setup', function() {
 				]);
 			};
 
-			return signUp()
-				.then(createGame)
+			return archetype.forSinglePlayerLobby()
 				.then(placeShips)
 				.then(assert);
 		});
@@ -55,24 +47,14 @@ describe('Game setup', function() {
 			var ship1 = {ship: 1, x: 0, y: 0, r: 2};
 			var ship2 = {ship: 2, x: 0, y: 0, r: 2};
 
-			var signUp = function() {
-				return player.signUp('Jan');
-			};
-
-			var createGame = function(guid) {
-				return game.create(guid).then(function(gameId) {
-					return {guid: guid, gameId: gameId};
-				});
-			};
-
 			var placeCarrier = function(state) {
-				return game.place(state.guid, state.gameId, ship1).then(function() {
+				return game.place(state.guidP1, state.gameId, ship1).then(function() {
 					return state;
 				});
 			};
 
 			var placeBattleship = function(state) {
-				_collision = game.place(state.guid, state.gameId, ship2);
+				_collision = game.place(state.guidP1, state.gameId, ship2);
 			};
 
 			var assert = function() {
@@ -80,10 +62,18 @@ describe('Game setup', function() {
 					.to.be.rejectedWith('Ships cannot collide');
 			};
 
-			return signUp()
-				.then(createGame)
+			return archetype.forSinglePlayerLobby()
 				.then(placeCarrier)
 				.then(placeBattleship)
+				.then(assert);
+		});
+
+		xit('should not be allowed after game started', function() {
+			return signUpPlayers()
+				.then(createGame)
+				.then(joinGame)
+				.then(playersGetReady)
+				.then(getReadyOnceMore)
 				.then(assert);
 		});
 
@@ -94,23 +84,13 @@ describe('Game setup', function() {
 			var ship4 = {ship: 4, x: 0, y: 3, r: 2};
 			var ship5 = {ship: 5, x: 0, y: 4, r: 2};
 
-			var signUp = function() {
-				return player.signUp('Jan');
-			};
-
-			var createGame = function(guid) {
-				return game.create(guid).then(function(gameId) {
-					return {guid: guid, gameId: gameId};
-				});
-			};
-
 			var placeShips = function(state) {
 				return {
-					p1: game.place(state.guid, state.gameId, ship1),
-					p2: game.place(state.guid, state.gameId, ship2),
-					p3: game.place(state.guid, state.gameId, ship3),
-					p4: game.place(state.guid, state.gameId, ship4),
-					p5: game.place(state.guid, state.gameId, ship5)
+					p1: game.place(state.guidP1, state.gameId, ship1),
+					p2: game.place(state.guidP1, state.gameId, ship2),
+					p3: game.place(state.guidP1, state.gameId, ship3),
+					p4: game.place(state.guidP1, state.gameId, ship4),
+					p5: game.place(state.guidP1, state.gameId, ship5)
 				};
 			};
 
@@ -124,8 +104,7 @@ describe('Game setup', function() {
 				]);
 			};
 
-			return signUp()
-				.then(createGame)
+			return archetype.forSinglePlayerLobby()
 				.then(placeShips)
 				.then(assert);
 		});
