@@ -1,7 +1,7 @@
 describe('Player', function() {
 
 	var Player = require('../models/player.js');
-	var playerDaoFake = require('./fakes/player-dao-fake.js');
+	var playerDaoFake = require('./artifacts/player-dao-fake.js');
 
 	var player;
 
