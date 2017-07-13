@@ -65,6 +65,10 @@ var Game = function(gameDao, playerDao) {
 			.then(assertShipsArePlaced);
 	};
 
+	api.shoot = function() {
+		return Promise.reject('Game not started yet');
+	};
+
 
 	var initGame = function(guid) {
 		return {
