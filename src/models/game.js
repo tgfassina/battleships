@@ -151,14 +151,23 @@ var Game = function(gameDao, playerDao) {
 			.then(setAsReady);
 	};
 
-	api.shoot = function(guid, gameId) {
+	api.shoot = function(guid, gameId, shot) {
 
-		var assertGameStarted = function() {
-			return Promise.reject('Game not started yet');
+		var returnShotResult = function(gameData) {
+			var hit = false;
+			var enemy = getEnemy(gameData, guid);
+
+			_.forEach(gameData.board[enemy], function(enemyShip) {
+				if (enemyShip.x === shot.x && enemyShip.y === shot.y) {
+					hit = true;
+				}
+			});
+
+			return Promise.resolve(hit);
 		};
 
-		return assertPlayerInGame(guid, gameId)
-			.then(assertGameStarted);
+		return assertPlaying(guid, gameId)
+			.then(returnShotResult);
 	};
 
 
@@ -200,6 +209,18 @@ var Game = function(gameDao, playerDao) {
 		return gameDao.getById(gameId).then(assert);
 	};
 
+	var assertGameStarted = function(gameData) {
+		if (!gameData.ready.p1 || !gameData.ready.p2) {
+			return Promise.reject('Game not started yet');
+		}
+		return gameData;
+	};
+
+	var assertPlaying = function(guid, gameId) {
+		return assertPlayerInGame(guid, gameId)
+			.then(assertGameStarted);
+	};
+
 	var getPlayer = function(gameData, guid) {
 		if (gameData.player1 === guid) {
 			return 'p1';
@@ -207,6 +228,18 @@ var Game = function(gameDao, playerDao) {
 
 		if (gameData.player2 === guid) {
 			return 'p2';
+		}
+
+		return null;
+	};
+
+	var getEnemy = function(gameData, guid) {
+		if (gameData.player1 === guid) {
+			return 'p2';
+		}
+
+		if (gameData.player2 === guid) {
+			return 'p1';
 		}
 
 		return null;
