@@ -33,7 +33,7 @@ describe('Game setup', function() {
 			};
 
 			var assert = function() {
-				expect(_shot).to.be.rejectedWith('Game not started yet');
+				return expect(_shot).to.be.rejectedWith('Game not started yet');
 			};
 
 			return signUp()
