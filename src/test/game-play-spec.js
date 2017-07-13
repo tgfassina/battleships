@@ -38,31 +38,6 @@ describe('Gameplay', function() {
 			var _badShot;
 			var _goodShot;
 
-			var signUpPlayers = function() {
-				return Promise.all([
-					player.signUp('Jan'),
-					player.signUp('Andy')
-				]).then(function(guids) {
-					return {
-						guidJan: guids[0],
-						guidAndy: guids[1]
-					};
-				});
-			};
-
-			var createGame = function(state) {
-				return game.create(state.guidJan).then(function(gameId) {
-					state.gameId = gameId
-					return state;
-				});
-			};
-
-			var joinGame = function(state) {
-				return game.join(state.guidAndy, state.gameId).then(function() {
-					return state;
-				});
-			};
-
 			var placeInGame = function(guid, gameId) {
 				return function(ship, x, y, r) {
 					var position = {ship: ship, x: x, y: y, r: r};
@@ -117,9 +92,7 @@ describe('Gameplay', function() {
 				]);
 			};
 
-			return signUpPlayers()
-				.then(createGame)
-				.then(joinGame)
+			return archetype.forTwoPlayersLobby()
 				.then(placeShips)
 				.then(playersReady)
 				.then(missShot)

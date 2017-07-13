@@ -69,9 +69,7 @@ describe('Game setup', function() {
 		});
 
 		xit('should not be allowed after game started', function() {
-			return signUpPlayers()
-				.then(createGame)
-				.then(joinGame)
+			return archetype.forTwoPlayerLobby()
 				.then(playersGetReady)
 				.then(getReadyOnceMore)
 				.then(assert);

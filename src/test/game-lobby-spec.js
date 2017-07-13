@@ -73,45 +73,24 @@ describe('Game lobby', function() {
 		it('should require lobby to have an empty slot', function() {
 			var _joinAttempt;
 
-			var signUpPlayers = function() {
-				return Promise.all([
-					player.signUp('Jan'),
-					player.signUp('Andy'),
-					player.signUp('Thiago')
-				]).then(function(guids) {
-					return {
-						guidJan: guids[0],
-						guidAndy: guids[1],
-						guidThiago: guids[2]
-					};
-				});
-			};
-
-			var janCreates = function(state) {
-				return game.create(state.guidJan).then(function(gameId) {
-					state.gameId = gameId;
+			var thirdPlayerSignsUp = function(state) {
+				return player.signUp('Thiago').then(function(guid) {
+					state.guidP3 = guid;
 					return state;
 				});
 			};
 
-			var andyJoins = function(state) {
-				return game.join(state.guidAndy, state.gameId).then(function() {
-					return state;
-				});
-			};
-
-			var thiagoJoins = function(state) {
-				_joinAttempt = game.join(state.guidThiago, state.gameId);
+			var thirdPlayerJoins = function(state) {
+				_joinAttempt = game.join(state.guidP3, state.gameId);
 			};
 
 			var assert = function() {
 				return expect(_joinAttempt).to.be.rejectedWith('Lobby is full');
 			};
 
-			return signUpPlayers()
-				.then(janCreates)
-				.then(andyJoins)
-				.then(thiagoJoins)
+			return archetype.forTwoPlayersLobby()
+				.then(thirdPlayerSignsUp)
+				.then(thirdPlayerJoins)
 				.then(assert);
 		});
 	});
