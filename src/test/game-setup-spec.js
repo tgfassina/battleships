@@ -43,5 +43,39 @@ describe('Game setup', function() {
 				.then(readyUp)
 				.then(assert);
 		});
+
+		it('should require the player to be in the game', function() {
+			var _andysGuid;
+			var _readyAttempt;
+
+			var playersSignUp = function() {
+				return Promise.all([
+					player.signUp('Jan'),
+					player.signUp('Andy')
+				])
+				.then(function(guids) {
+					_andysGuid = guids[1];
+					return guids[0];
+				});
+			};
+
+			var janCreatesGame = function(jansGuid) {
+				return game.create(jansGuid);
+			};
+
+			var andyGetsReady = function(gameId) {
+				_readyAttempt = game.ready(_andysGuid, gameId);
+			};
+
+			var assert = function() {
+				return expect(_readyAttempt)
+					.to.be.rejectedWith('Player is not in game');
+			};
+
+			return playersSignUp()
+				.then(janCreatesGame)
+				.then(andyGetsReady)
+				.then(assert);
+		});
 	});
 });

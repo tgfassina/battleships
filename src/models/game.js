@@ -39,8 +39,30 @@ var Game = function(gameDao, playerDao) {
 		return Promise.reject('Invalid ship');
 	};
 
-	api.ready = function() {
-		return Promise.reject('Must place all ships');
+	api.ready = function(guid, gameId) {
+
+		var getGame = function() {
+			return gameDao.getById(gameId);
+		};
+
+		var assertPlayerInGame = function(gameData) {
+			var isPlayer1 = gameData.player1 === guid;
+			var isPlayer2 = gameData.player2 === guid;
+
+			if (!isPlayer1 && !isPlayer2) {
+				return Promise.reject('Player is not in game');
+			}
+
+			return gameData;
+		};
+
+		var assertShipsArePlaced = function(gameData) {
+			return Promise.reject('Must place all ships');
+		};
+
+		return getGame(gameId)
+			.then(assertPlayerInGame)
+			.then(assertShipsArePlaced);
 	};
 
 	var initGame = function(guid) {
