@@ -52,8 +52,8 @@ describe('Gameplay', function() {
 
 			var assert = function() {
 				return Promise.all([
-					expect(_badShot).to.eventually.equal(false),
-					expect(_goodShot).to.eventually.equal(true)
+					expect(_badShot).to.eventually.equal('Miss'),
+					expect(_goodShot).to.eventually.equal('Hit')
 				]);
 			};
 

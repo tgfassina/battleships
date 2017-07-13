@@ -163,7 +163,7 @@ var Game = function(gameDao, playerDao) {
 				}
 			});
 
-			return Promise.resolve(hit);
+			return hit ? 'Hit' : 'Miss';
 		};
 
 		return assertPlaying(guid, gameId)
