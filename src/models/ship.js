@@ -12,4 +12,8 @@ Ship.getName = function(ship) {
 	return shipData[ship.ship].name;
 };
 
+Ship.occupiesTile = function(ship, tile) {
+	return ship.x === tile.x && ship.y === tile.y;
+};
+
 module.exports = Ship;

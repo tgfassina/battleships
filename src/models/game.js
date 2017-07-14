@@ -21,7 +21,9 @@ var Game = function(gameDao, playerDao) {
 			var collision = false
 			_.forEach(gameData.board[player], function(placedShip) {
 				if (!placedShip) return;
-				if (ship.x === placedShip.x && ship.y === placedShip.y) {
+
+				var tile = {x: ship.x, y: ship.y};
+				if (Ship.occupiesTile(placedShip, tile)) {
 					collision = true;
 				}
 			});
@@ -121,7 +123,7 @@ var Game = function(gameDao, playerDao) {
 			var enemy = getEnemy(gameData, guid);
 
 			_.forEach(gameData.board[enemy], function(enemyShip) {
-				if (enemyShip.x === shot.x && enemyShip.y === shot.y) {
+				if (Ship.occupiesTile(enemyShip, shot)) {
 					hit = true;
 				}
 			});
