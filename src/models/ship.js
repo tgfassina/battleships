@@ -21,6 +21,19 @@ Ship.occupiesTile = function(ship, tile) {
 	return _.find(getShipTiles(ship), compareTile) ? true : false;
 };
 
+Ship.hasCollision = function(ship1, ship2) {
+	var tiles1 = getShipTiles(ship1);
+
+	var hasCollision = false;
+	_.forEach(tiles1, function(tile) {
+		if (Ship.occupiesTile(ship2, tile)) {
+			hasCollision = true;
+		}
+	});
+
+	return hasCollision;
+};
+
 var getShipTiles = function(ship) {
 	var tiles = [];
 	var shipSize = shipData[ship.ship].size;

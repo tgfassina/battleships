@@ -36,7 +36,7 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
-		it('should not allow ships to be placed on the same tile', function() {
+		it('should not allow ship heads to collide', function() {
 			var _collision;
 
 			var placeCarrier = function(state) {
@@ -62,7 +62,7 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
-		it('should not allow ships to be placed on ships tails', function() {
+		it('should not allow ship heads to collide with other ships', function() {
 			var _collision;
 
 			var placeCarrier = function(state) {
@@ -74,6 +74,32 @@ describe('Game setup', function() {
 
 			var placeBattleship = function(state) {
 				var ship = {ship: 2, x: 1, y: 0, r: 2};
+				_collision = game.place(state.guidP1, state.gameId, ship);
+			};
+
+			var assert = function() {
+				return expect(_collision)
+					.to.be.rejectedWith('Ships cannot collide');
+			};
+
+			return archetype.forSinglePlayerLobby()
+				.then(placeCarrier)
+				.then(placeBattleship)
+				.then(assert);
+		});
+
+		it('should not allow ship tails to collide with other ships', function() {
+			var _collision;
+
+			var placeCarrier = function(state) {
+				var ship = {ship: 1, x: 0, y: 0, r: 3};
+				return game.place(state.guidP1, state.gameId, ship).then(function() {
+					return state;
+				});
+			};
+
+			var placeBattleship = function(state) {
+				var ship = {ship: 5, x: 1, y: 1, r: 4};
 				_collision = game.place(state.guidP1, state.gameId, ship);
 			};
 
