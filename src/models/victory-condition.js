@@ -7,15 +7,18 @@ VictoryConditions.run = function(gameData) {
 	var p2Score = 0;
 
 	_.forEach(gameData.moves.p1, function(move) {
-		_.forEach(gameData.board.p2, function(ship) {
+		_.forEach(gameData.board.p2, function(ship) {7
 			if (Ship.occupiesTile(ship, move)) {
 				p1Score++;
 			}
 		});
 	});
 
-	if (p1Score === 17) {
-		return {complete: true};
+	if (p1Score >= 17) {
+		return {
+			complete: true,
+			winner: gameData.player1
+		};
 	}
 
 	_.forEach(gameData.moves.p2, function(move) {
@@ -26,8 +29,11 @@ VictoryConditions.run = function(gameData) {
 		});
 	});
 
-	if (p2Score === 17) {
-		return {complete: true};
+	if (p2Score >= 17) {
+		return {
+			complete: true,
+			winner: gameData.player2
+		};
 	}
 
 	return {complete: false};

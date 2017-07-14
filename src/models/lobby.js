@@ -1,3 +1,5 @@
+var VictoryCondition = require('./victory-condition.js');
+
 var Lobby = function(gameDao, playerDao) {
 
 	var api = {};
@@ -52,6 +54,33 @@ var Lobby = function(gameDao, playerDao) {
 			.then(joinLobby);
 	};
 
+	api.status = function(gameId) {
+		var getGame = function() {
+			return gameDao.getById(gameId);
+		};
+
+		var getStatus = function(gameData) {
+			var status = 'setup';
+			var winner = null;
+
+			if (gameData.ready.p1 && gameData.ready.p2) {
+				status = 'playing';
+			}
+
+			var result = VictoryCondition.run(gameData)
+			if (result.complete) {
+				status = 'complete';
+				winner = result.winner;
+			};
+
+			return {
+				status: status,
+				winner: winner
+			};
+		};
+
+		return getGame().then(getStatus);
+	};
 
 	var initGame = function(guid) {
 		return {

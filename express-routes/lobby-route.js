@@ -20,6 +20,14 @@ LobbyRoute = function(app, lobby) {
 			res.status(500).send(msg);
 		});
 	});
+
+	app.get('/lobby/status/:gameId', function(req, res) {
+		lobby.status(req.params.gameId).then(function(data) {
+			res.send(data);
+		}).catch(function(msg) {
+			res.status(500).send(msg);
+		});
+	});
 };
 
 module.exports = LobbyRoute;
