@@ -169,5 +169,30 @@ describe('Gameplay', function() {
 				.then(shootDuplicated)
 				.then(assert);
 		});
+
+		it('should be within the board', function() {
+			var shootOutOfBoard = function(state) {
+				return {
+					top: game.shoot(state.guidP1, state.gameId, {x: 0, y: -1}),
+					right: game.shoot(state.guidP1, state.gameId, {x: 10, y: 0}),
+					bottom: game.shoot(state.guidP1, state.gameId, {x: 0, y: 10}),
+					left: game.shoot(state.guidP1, state.gameId, {x: -1, y: 0})
+				};
+			};
+
+			var assert = function(shots) {
+				var message = 'Must shoot within board';
+				return Promise.all([
+					expect(shots.top).to.be.rejectedWith(message),
+					expect(shots.right).to.be.rejectedWith(message),
+					expect(shots.bottom).to.be.rejectedWith(message),
+					expect(shots.left).to.be.rejectedWith(message)
+				]);
+			};
+
+			return archetype.forTwoPlayersLobbyStarted()
+				.then(shootOutOfBoard)
+				.then(assert);
+		});
 	});
 });

@@ -110,6 +110,13 @@ var Game = function(gameDao, playerDao) {
 			return gameData;
 		};
 
+		var assertWithinBoard = function(gameData) {
+			if (shot.x < 0 || shot.x > 9 || shot.y < 0 || shot.y > 9) {
+				return Promise.reject('Must shoot within board');
+			}
+			return gameData;
+		};
+
 		var assertUniqueShot = function(gameData) {
 			var player = getPlayer(gameData, guid);
 
@@ -151,6 +158,7 @@ var Game = function(gameDao, playerDao) {
 		return assertPlaying(guid, gameId)
 			.then(assertGameNotOver)
 			.then(assertPlayerTurn)
+			.then(assertWithinBoard)
 			.then(assertUniqueShot)
 			.then(saveShot)
 			.then(returnShotResult);
