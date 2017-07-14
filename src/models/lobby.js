@@ -67,18 +67,33 @@ var Lobby = function(gameDao, playerDao) {
 				status = 'playing';
 			}
 
-			var stats = VictoryCondition.run(gameData)
-			if (stats.complete) {
+			var result = VictoryCondition.run(gameData)
+			if (result.complete) {
 				status = 'complete';
 			};
 
 			return {
 				phase: status,
-				stats: stats
+				score: {
+					player1: result.p1Score,
+					player2: result.p2Score
+				},
+				winner: result.winner
 			};
 		};
 
-		return getGame().then(getStatus);
+		var setWinnerName = function(status) {
+			if (status.winner) {
+				return playerDao.getByGuid(status.winner).then(function(data) {
+					status.winner = data.name;
+					return status;
+				});
+			}
+
+			return status;
+		};
+
+		return getGame().then(getStatus).then(setWinnerName);
 	};
 
 	var initGame = function(guid) {
