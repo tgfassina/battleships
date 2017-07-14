@@ -232,9 +232,9 @@ describe('Game setup', function() {
 					player.signUp('Jan'),
 					player.signUp('Andy')
 				])
-				.then(function(guids) {
-					_andysGuid = guids[1];
-					return guids[0];
+				.then(function(responses) {
+					_andysGuid = responses[1].guid;
+					return responses[0].guid;
 				});
 			};
 

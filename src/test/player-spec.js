@@ -16,8 +16,8 @@ describe('Player', function() {
 		});
 
 		it('should provide guid', function() {
-			var assert = function(guid) {
-				return expect(guid.length).to.equal(36);
+			var assert = function(response) {
+				return expect(response.guid.length).to.equal(36);
 			};
 
 			return player.signUp('Jan').then(assert);
@@ -32,8 +32,8 @@ describe('Player', function() {
 				]);
 			};
 
-			var assert = function(playersData) {
-				expect(playersData[0]).to.not.equal(playersData[1]);
+			var assert = function(responses) {
+				expect(responses[0].guid).to.not.equal(responses[1].guid);
 			};
 
 			return playersSignUp().then(assert);

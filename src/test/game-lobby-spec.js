@@ -35,8 +35,8 @@ describe('Game lobby', function() {
 				return player.signUp('Jan');
 			};
 
-			var joinInexistingGame = function(guid) {
-				_joinAttempt = lobby.join(guid, '0000');
+			var joinInexistingGame = function(response) {
+				_joinAttempt = lobby.join(response.guid, '0000');
 			};
 
 			var assert = function() {
@@ -68,8 +68,8 @@ describe('Game lobby', function() {
 			var _joinAttempt;
 
 			var thirdPlayerSignsUp = function(state) {
-				return player.signUp('Thiago').then(function(guid) {
-					state.guidP3 = guid;
+				return player.signUp('Thiago').then(function(response) {
+					state.guidP3 = response.guid;
 					return state;
 				});
 			};

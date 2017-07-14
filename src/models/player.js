@@ -8,11 +8,14 @@ var Player = function(dao) {
 		if (!name) return Promise.reject('Failed to provide name');
 		var guid = Guid.raw();
 
-		var returnGuid = function(data) {
-			return data['guid'];
+		var response = function(data) {
+			return {
+				message: 'Signed up as '+data.name,
+				guid: data.guid
+			};
 		};
 
-		return dao.save(name, guid).then(returnGuid);
+		return dao.save(name, guid).then(response);
 	};
 
 	return api;

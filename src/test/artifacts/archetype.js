@@ -21,8 +21,8 @@ var Archetype = function() {
 	};
 
 	var signUpOne = function() {
-		return player.signUp('Nameless').then(function(guid) {
-			return {guidP1: guid}
+		return player.signUp('Nameless').then(function(response) {
+			return {guidP1: response.guid}
 		});
 	};
 
@@ -30,10 +30,10 @@ var Archetype = function() {
 		return Promise.all([
 			player.signUp('Jan'),
 			player.signUp('Andy')
-		]).then(function(guids) {
+		]).then(function(responses) {
 			return {
-				guidP1: guids[0],
-				guidP2: guids[1]
+				guidP1: responses[0].guid,
+				guidP2: responses[1].guid
 			};
 		});
 	};
