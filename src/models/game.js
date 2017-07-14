@@ -37,7 +37,12 @@ var Game = function(gameDao, playerDao) {
 
 		var placeShip = function(gameData) {
 			var player = getPlayer(gameData, guid);
-			gameData.board[player][ship.ship] = ship;
+			gameData.board[player][ship.ship] = {
+				ship: ship.ship,
+				x: ship.x,
+				y: ship.y,
+				r: ship.r
+			};
 			return gameDao.update(gameData._id, gameData);
 		};
 
@@ -46,6 +51,7 @@ var Game = function(gameDao, playerDao) {
 		};
 
 		return assertPlayerInGame(guid, gameId)
+			.then(assertGameIsNotStarted)
 			.then(assertValidShip)
 			.then(assertNoCollision)
 			.then(placeShip)
@@ -67,13 +73,6 @@ var Game = function(gameDao, playerDao) {
 				return Promise.reject('Must place all ships');
 			}
 
-			return gameData;
-		};
-
-		var assertGameIsNotStarted = function(gameData) {
-			if (gameData.ready.p1 && gameData.ready.p2) {
-				return Promise.reject('Game already started');
-			}
 			return gameData;
 		};
 
@@ -157,6 +156,13 @@ var Game = function(gameDao, playerDao) {
 			.then(returnShotResult);
 	};
 
+
+	var assertGameIsNotStarted = function(gameData) {
+		if (gameData.ready.p1 && gameData.ready.p2) {
+			return Promise.reject('Game already started');
+		}
+		return gameData;
+	};
 
 	var assertPlayerInGame = function(guid, gameId) {
 		var assert = function(gameData) {

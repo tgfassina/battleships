@@ -14,6 +14,23 @@ describe('Game setup', function() {
 	});
 
 	describe('place', function() {
+		it('should assert game is not started', function() {
+			var _fail;
+
+			var tryToPlace = function(state) {
+				var placement = {ship: 1, x: 9, y: 9, r: 1};
+				_fail = game.place(state.guidP1, state.gameId, placement);
+			};
+
+			var assert = function() {
+				return expect(_fail).to.be.rejectedWith('Game already started');
+			};
+
+			return archetype.forTwoPlayersLobbyStarted()
+				.then(tryToPlace)
+				.then(assert);
+		});
+
 		it('should validate ship type', function() {
 
 			var placeShips = function(state) {
