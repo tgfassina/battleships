@@ -36,6 +36,29 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
+		it('should collide with itself', function() {
+			var placeCarrier = function(state) {
+				var ship = {ship: 1, x: 2, y: 2, r: 3};
+				return game.place(state.guidP1, state.gameId, ship).then(function() {
+					return state;
+				});
+			};
+
+			var moveCarrier = function(state) {
+				var ship = {ship: 1, x: 0, y: 2, r: 2};
+				return game.place(state.guidP1, state.gameId, ship);
+			};
+
+			var assert = function(result) {
+				return expect(result).to.equal('Carrier');
+			};
+
+			return archetype.forSinglePlayerLobby()
+				.then(placeCarrier)
+				.then(moveCarrier)
+				.then(assert);
+		});
+
 		it('should not allow ship heads to collide', function() {
 			var _collision;
 

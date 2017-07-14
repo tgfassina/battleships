@@ -21,6 +21,7 @@ var Game = function(gameDao, playerDao) {
 			var collision = false
 			_.forEach(gameData.board[player], function(placedShip) {
 				if (!placedShip) return;
+				if (placedShip.ship === ship.ship) return;
 				if (Ship.hasCollision(placedShip, ship)) {
 					collision = true;
 				}
