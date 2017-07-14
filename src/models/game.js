@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var Ship = require('./ship.js');
+var VictoryCondition = require('./victory-condition.js');
 
 var Game = function(gameDao, playerDao) {
 
@@ -90,6 +91,14 @@ var Game = function(gameDao, playerDao) {
 
 	api.shoot = function(guid, gameId, shot) {
 
+		var assertGameNotOver = function(gameData) {
+			var result = VictoryCondition.run(gameData)
+			if (result.complete) {
+				return Promise.reject('Game is complete');
+			};
+			return gameData;
+		};
+
 		var assertPlayerTurn = function(gameData) {
 			var moves = gameData.moves;
 			var hasTheTurn = moves.p1.length > moves.p2.length ? 'p2' : 'p1';
@@ -107,7 +116,7 @@ var Game = function(gameDao, playerDao) {
 
 			var reducer = function(unique, move) {
 				var isEqual = shot.x === move.x && shot.y === move.y;
-				return unique && !isEqual;
+				return !isEqual && unique;
 			};
 
 			var unique = _.reduce(gameData.moves[player], reducer, true);
@@ -141,6 +150,7 @@ var Game = function(gameDao, playerDao) {
 		};
 
 		return assertPlaying(guid, gameId)
+			.then(assertGameNotOver)
 			.then(assertPlayerTurn)
 			.then(assertUniqueShot)
 			.then(saveShot)
