@@ -16,6 +16,13 @@ var Game = function(gameDao, playerDao) {
 			return gameData
 		};
 
+		var assertWithinBoard = function(gameData) {
+			if (!Ship.isWithinBoard(ship)) {
+				return Promise.reject('Must place ship within board');
+			}
+			return gameData;
+		};
+
 		var assertNoCollision = function(gameData) {
 			var player = getPlayer(gameData, guid);
 
@@ -53,6 +60,7 @@ var Game = function(gameDao, playerDao) {
 		return assertPlayerInGame(guid, gameId)
 			.then(assertGameIsNotStarted)
 			.then(assertValidShip)
+			.then(assertWithinBoard)
 			.then(assertNoCollision)
 			.then(placeShip)
 			.then(returnName);

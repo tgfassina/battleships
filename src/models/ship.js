@@ -13,6 +13,16 @@ Ship.getName = function(ship) {
 	return shipData[ship.ship].name;
 };
 
+Ship.isWithinBoard = function(ship) {
+	var shipTiles = getShipTiles(ship);
+	var reducer = function(carry, tile) {
+		var isOut = tile.x < 0 || tile.x > 9 || tile.y < 0 || tile.y > 9;
+		return carry && !isOut;
+	};
+
+	return _.reduce(shipTiles, reducer, true);
+};
+
 Ship.occupiesTile = function(ship, tile) {
 	var compareTile = function(candidate) {
 		return candidate.x === tile.x && candidate.y === tile.y;

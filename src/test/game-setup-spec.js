@@ -155,6 +155,23 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
+		it('should assert ships are within the board', function() {
+			var _fail;
+
+			var placeOutside = function(state) {
+				var placement = {ship: 1, x: 0, y: 0, r: 1}
+				_fail = game.place(state.guidP1, state.gameId, placement);
+			};
+
+			var assert = function() {
+				return expect(_fail).to.be.rejectedWith('Must place ship within board');
+			};
+
+			return archetype.forSinglePlayerLobby()
+				.then(placeOutside)
+				.then(assert);
+		});
+
 		it('should inform ship name when successfully placed', function() {
 			var ship1 = {ship: 1, x: 0, y: 0, r: 2};
 			var ship2 = {ship: 2, x: 0, y: 1, r: 2};
