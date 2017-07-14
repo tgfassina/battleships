@@ -155,22 +155,6 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
-		it('should not be allowed after game started', function() {
-			var _alreadyReady;
-
-			var getReadyOnceMore = function(state) {
-				_alreadyReady = game.ready(state.guidP2, state.gameId);
-			};
-
-			var assert = function() {
-				return expect(_alreadyReady).to.be.rejectedWith('Game already started');
-			};
-
-			return archetype.forTwoPlayersLobbyStarted()
-				.then(getReadyOnceMore)
-				.then(assert);
-		});
-
 		it('should inform ship name when successfully placed', function() {
 			var ship1 = {ship: 1, x: 0, y: 0, r: 2};
 			var ship2 = {ship: 2, x: 0, y: 1, r: 2};
@@ -253,6 +237,22 @@ describe('Game setup', function() {
 			return playersSignUp()
 				.then(janCreatesGame)
 				.then(andyGetsReady)
+				.then(assert);
+		});
+
+		it('should not be allowed after game started', function() {
+			var _alreadyReady;
+
+			var getReadyOnceMore = function(state) {
+				_alreadyReady = game.ready(state.guidP2, state.gameId);
+			};
+
+			var assert = function() {
+				return expect(_alreadyReady).to.be.rejectedWith('Game already started');
+			};
+
+			return archetype.forTwoPlayersLobbyStarted()
+				.then(getReadyOnceMore)
 				.then(assert);
 		});
 	});
