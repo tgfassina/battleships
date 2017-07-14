@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var Ship = {};
 
 var shipData = {
@@ -13,7 +14,36 @@ Ship.getName = function(ship) {
 };
 
 Ship.occupiesTile = function(ship, tile) {
-	return ship.x === tile.x && ship.y === tile.y;
+	var compareTile = function(candidate) {
+		return candidate.x === tile.x && candidate.y === tile.y;
+	};
+
+	return _.find(getShipTiles(ship), compareTile) ? true : false;
+};
+
+var getShipTiles = function(ship) {
+	var tiles = [];
+	var shipSize = shipData[ship.ship].size;
+	for (var i = 0; i < shipSize; i++) {
+		var tile = {x: ship.x, y: ship.y};
+
+		if (ship.r === 1) {
+			tile.y -= i;
+		}
+		if (ship.r === 2) {
+			tile.x += i;
+		}
+		if (ship.r === 3) {
+			tile.y += i;
+		}
+		if (ship.r === 4) {
+			tile.x -= i;
+		}
+
+		tiles.push(tile);
+	}
+
+	return tiles;
 };
 
 module.exports = Ship;

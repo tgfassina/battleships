@@ -62,7 +62,7 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
-		xit('should not allow ships to be placed on ships tails', function() {
+		it('should not allow ships to be placed on ships tails', function() {
 			var _collision;
 
 			var placeCarrier = function(state) {

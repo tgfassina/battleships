@@ -37,13 +37,7 @@ var Game = function(gameDao, playerDao) {
 
 		var placeShip = function(gameData) {
 			var player = getPlayer(gameData, guid);
-
-			gameData.board[player][ship.ship] = {
-				x: ship.x,
-				y: ship.y,
-				r: ship.r
-			};
-
+			gameData.board[player][ship.ship] = ship;
 			return gameDao.update(gameData._id, gameData);
 		};
 
@@ -86,7 +80,6 @@ var Game = function(gameDao, playerDao) {
 		var setAsReady = function(gameData) {
 			var player = getPlayer(gameData, guid);
 			gameData.ready[player] = true;
-
 			return gameDao.update(gameData._id, gameData);
 		};
 
