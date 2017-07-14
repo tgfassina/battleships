@@ -1,4 +1,5 @@
-_ = require('lodash');
+var _ = require('lodash');
+var Ship = require('./ship.js');
 
 var Game = function(gameDao, playerDao) {
 
@@ -44,16 +45,8 @@ var Game = function(gameDao, playerDao) {
 			return gameDao.update(gameData._id, gameData);
 		};
 
-		var returnName = function() {
-			var shipNames = [
-				'',
-				'Carrier',
-				'Battleship',
-				'Cruiser',
-				'Submarine',
-				'Destroyer'
-			];
-			return shipNames[ship.ship];
+		var returnName = function() {;
+			return Ship.getName(ship);
 		};
 
 		return assertPlayerInGame(guid, gameId)
