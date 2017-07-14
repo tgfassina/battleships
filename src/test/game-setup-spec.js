@@ -4,6 +4,7 @@ describe('Game setup', function() {
 	var archetype;
 	var player;
 	var lobby;
+	var game;
 
 	beforeEach(function() {
 		archetype = Archetype();

@@ -102,6 +102,23 @@ var Game = function(gameDao, playerDao) {
 			return gameData;
 		};
 
+		var assertUniqueShot = function(gameData) {
+			var player = getPlayer(gameData, guid);
+
+			var reducer = function(unique, move) {
+				var isEqual = shot.x === move.x && shot.y === move.y;
+				return unique && !isEqual;
+			};
+
+			var unique = _.reduce(gameData.moves[player], reducer, true);
+
+			if (!unique) {
+				return Promise.reject('Duplicated shot');
+			}
+
+			return gameData;
+		};
+
 		var saveShot = function(gameData) {
 			var player = getPlayer(gameData, guid);
 			gameData.moves[player].push(shot);
@@ -125,6 +142,7 @@ var Game = function(gameDao, playerDao) {
 
 		return assertPlaying(guid, gameId)
 			.then(assertPlayerTurn)
+			.then(assertUniqueShot)
 			.then(saveShot)
 			.then(returnShotResult);
 	};

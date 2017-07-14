@@ -4,6 +4,7 @@ describe('Gameplay', function() {
 	var archetype;
 	var player;
 	var lobby;
+	var game;
 
 	beforeEach(function() {
 		archetype = Archetype();
@@ -135,6 +136,37 @@ describe('Gameplay', function() {
 
 			return archetype.forTwoPlayersLobbyStarted()
 				.then(shoot)
+				.then(assert);
+		});
+
+		it('should not allow duplicated shots', function() {
+			var _duplicated;
+			var shot = {x: 0, y: 0};
+
+			var shoot = function(state) {
+				return game.shoot(state.guidP1, state.gameId, shot).then(function() {
+					return state;
+				});
+			};
+
+			var enemyShoots = function(state) {
+				return game.shoot(state.guidP2, state.gameId, shot).then(function() {
+					return state;
+				});
+			};
+
+			var shootDuplicated = function(state) {
+				_duplicated = game.shoot(state.guidP1, state.gameId, shot);
+			};
+
+			var assert = function() {
+				return expect(_duplicated).to.be.rejectedWith('Duplicated shot');
+			};
+
+			return archetype.forTwoPlayersLobbyStarted()
+				.then(shoot)
+				.then(enemyShoots)
+				.then(shootDuplicated)
 				.then(assert);
 		});
 	});
