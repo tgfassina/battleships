@@ -1,28 +1,31 @@
 describe('Game setup', function() {
 
-	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
+	var Lobby = require('../models/lobby.js');
+	var Game = require('../models/game.js');
 
 	var Archetype = require('./artifacts/archetype.js');
 	var gameDaoFake = require('./artifacts/game-dao-fake.js');
 	var playerDaoFake = require('./artifacts/player-dao-fake.js');
 
 	var archetype;
-	var game;
 	var player;
+	var lobby;
+	var game;
 
 	beforeEach(function() {
-		game = Game(gameDaoFake, playerDaoFake);
 		player = Player(playerDaoFake);
-		archetype = Archetype(player, game);
+		lobby = Lobby(gameDaoFake, playerDaoFake);
+		game = Game(gameDaoFake, playerDaoFake);
+		archetype = Archetype(player, lobby, game);
 	});
 
 	describe('place', function() {
 		it('should validate ship type', function() {
-			var ship1 = {ship: 0, x: 0, y: 0, r: 2};
-			var ship2 = {ship: 6, x: 0, y: 0, r: 2};
 
 			var placeShips = function(state) {
+				var ship1 = {ship: 0, x: 0, y: 0, r: 2};
+				var ship2 = {ship: 6, x: 0, y: 0, r: 2};
 				return {
 					p1: game.place(state.guidP1, state.gameId, ship1),
 					p2: game.place(state.guidP1, state.gameId, ship2)
@@ -41,20 +44,45 @@ describe('Game setup', function() {
 				.then(assert);
 		});
 
-		it('should not allow ships be placed on the same tile', function() {
+		it('should not allow ships to be placed on the same tile', function() {
 			var _collision;
 
-			var ship1 = {ship: 1, x: 0, y: 0, r: 2};
-			var ship2 = {ship: 2, x: 0, y: 0, r: 2};
-
 			var placeCarrier = function(state) {
-				return game.place(state.guidP1, state.gameId, ship1).then(function() {
+				var ship = {ship: 1, x: 0, y: 0, r: 2};
+				return game.place(state.guidP1, state.gameId, ship).then(function() {
 					return state;
 				});
 			};
 
 			var placeBattleship = function(state) {
-				_collision = game.place(state.guidP1, state.gameId, ship2);
+				var ship = {ship: 2, x: 0, y: 0, r: 2};
+				_collision = game.place(state.guidP1, state.gameId, ship);
+			};
+
+			var assert = function() {
+				return expect(_collision)
+					.to.be.rejectedWith('Ships cannot collide');
+			};
+
+			return archetype.forSinglePlayerLobby()
+				.then(placeCarrier)
+				.then(placeBattleship)
+				.then(assert);
+		});
+
+		xit('should not allow ships to be placed on ships tails', function() {
+			var _collision;
+
+			var placeCarrier = function(state) {
+				var ship = {ship: 1, x: 0, y: 0, r: 2};
+				return game.place(state.guidP1, state.gameId, ship).then(function() {
+					return state;
+				});
+			};
+
+			var placeBattleship = function(state) {
+				var ship = {ship: 2, x: 1, y: 0, r: 2};
+				_collision = game.place(state.guidP1, state.gameId, ship);
 			};
 
 			var assert = function() {
@@ -113,6 +141,59 @@ describe('Game setup', function() {
 
 			return archetype.forSinglePlayerLobby()
 				.then(placeShips)
+				.then(assert);
+		});
+	});
+
+	describe('ready', function() {
+		it('should require all ships to be placed', function() {
+			var _readyAttempt;
+
+			var readyUp = function(state) {
+				_readyAttempt = game.ready(state.guidP1, state.gameId);
+			};
+
+			var assert = function() {
+				return expect(_readyAttempt)
+					.to.be.rejectedWith('Must place all ships');
+			};
+
+			return archetype.forSinglePlayerLobby()
+				.then(readyUp)
+				.then(assert);
+		});
+
+		it('should require the player to be in the game', function() {
+			var _andysGuid;
+			var _readyAttempt;
+
+			var playersSignUp = function() {
+				return Promise.all([
+					player.signUp('Jan'),
+					player.signUp('Andy')
+				])
+				.then(function(guids) {
+					_andysGuid = guids[1];
+					return guids[0];
+				});
+			};
+
+			var janCreatesGame = function(jansGuid) {
+				return lobby.create(jansGuid);
+			};
+
+			var andyGetsReady = function(gameId) {
+				_readyAttempt = game.ready(_andysGuid, gameId);
+			};
+
+			var assert = function() {
+				return expect(_readyAttempt)
+					.to.be.rejectedWith('Player is not in game');
+			};
+
+			return playersSignUp()
+				.then(janCreatesGame)
+				.then(andyGetsReady)
 				.then(assert);
 		});
 	});

@@ -1,20 +1,23 @@
 describe('Gameplay', function() {
 
-	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
+	var Lobby = require('../models/lobby.js');
+	var Game = require('../models/game.js');
 
 	var Archetype = require('./artifacts/archetype.js');
 	var gameDaoFake = require('./artifacts/game-dao-fake.js');
 	var playerDaoFake = require('./artifacts/player-dao-fake.js');
 
 	var archetype;
-	var game;
 	var player;
+	var lobby;
+	var game;
 
 	beforeEach(function() {
-		game = Game(gameDaoFake, playerDaoFake);
 		player = Player(playerDaoFake);
-		archetype = Archetype(player, game);
+		lobby = Lobby(gameDaoFake, playerDaoFake);
+		game = Game(gameDaoFake, playerDaoFake);
+		archetype = Archetype(player, lobby, game);
 	});
 
 	describe('shoot', function() {

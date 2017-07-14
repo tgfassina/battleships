@@ -14,23 +14,32 @@ mongoose.connect(config.db.host, {
 	useMongoClient: true
 });
 
-// Boot models
+
+// Boot DAOs
 var PlayerDao = require('./mongo-daos/player-dao.js');
 var playerDao = PlayerDao(mongoose);
-var Player = require('./src/models/player.js');
-var player = Player(playerDao);
 
 var GameDao = require('./mongo-daos/game-dao.js');
 var gameDao = GameDao(mongoose);
+
+
+// Boot models
+var Player = require('./src/models/player.js');
+var player = Player(playerDao);
+
 var Game = require('./src/models/game.js');
 var game = Game(gameDao, playerDao);
+
+var Lobby = require('./src/models/lobby.js');
+var lobby = Lobby(gameDao, playerDao);
+
 
 // Boot routes
 var PlayerRoute = require('./express-routes/player-route.js');
 PlayerRoute(app, player);
 
 var LobbyRoute = require('./express-routes/lobby-route.js');
-LobbyRoute(app, game);
+LobbyRoute(app, lobby);
 
 var GameRoute = require('./express-routes/game-route.js');
 GameRoute(app, game);

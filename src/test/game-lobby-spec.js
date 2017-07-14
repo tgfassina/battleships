@@ -1,25 +1,25 @@
 describe('Game lobby', function() {
 
-	var Game = require('../models/game.js');
 	var Player = require('../models/player.js');
+	var Lobby = require('../models/lobby.js');
 
 	var Archetype = require('./artifacts/archetype.js');
-	var gameDaoFake = require('./artifacts/game-dao-fake.js');
 	var playerDaoFake = require('./artifacts/player-dao-fake.js');
+	var gameDaoFake = require('./artifacts/game-dao-fake.js');
 
 	var archetype;
-	var game;
 	var player;
+	var lobby;
 
 	beforeEach(function() {
-		game = Game(gameDaoFake, playerDaoFake);
 		player = Player(playerDaoFake);
-		archetype = Archetype(player, game);
+		lobby = Lobby(gameDaoFake, playerDaoFake);
+		archetype = Archetype(player, lobby);
 	});
 
 	describe('create', function() {
 		it('should require existing player guid', function() {
-			var badCreate = game.create('0000');
+			var badCreate = lobby.create('0000');
 			expect(badCreate).to.be.rejectedWith('Player not found');
 		});
 
@@ -42,7 +42,7 @@ describe('Game lobby', function() {
 			};
 
 			var joinInexistingGame = function(guid) {
-				_joinAttempt = game.join(guid, '0000');
+				_joinAttempt = lobby.join(guid, '0000');
 			};
 
 			var assert = function() {
@@ -58,7 +58,7 @@ describe('Game lobby', function() {
 			var _joinAttempt;
 
 			var joinGame = function(state) {
-				_joinAttempt = game.join(state.guidP1, state.gameId);
+				_joinAttempt = lobby.join(state.guidP1, state.gameId);
 			};
 
 			var assert = function() {
@@ -81,7 +81,7 @@ describe('Game lobby', function() {
 			};
 
 			var thirdPlayerJoins = function(state) {
-				_joinAttempt = game.join(state.guidP3, state.gameId);
+				_joinAttempt = lobby.join(state.guidP3, state.gameId);
 			};
 
 			var assert = function() {
@@ -91,59 +91,6 @@ describe('Game lobby', function() {
 			return archetype.forTwoPlayersLobby()
 				.then(thirdPlayerSignsUp)
 				.then(thirdPlayerJoins)
-				.then(assert);
-		});
-	});
-
-	describe('ready', function() {
-		it('should require all ships to be placed', function() {
-			var _readyAttempt;
-
-			var readyUp = function(state) {
-				_readyAttempt = game.ready(state.guidP1, state.gameId);
-			};
-
-			var assert = function() {
-				return expect(_readyAttempt)
-					.to.be.rejectedWith('Must place all ships');
-			};
-
-			return archetype.forSinglePlayerLobby()
-				.then(readyUp)
-				.then(assert);
-		});
-
-		it('should require the player to be in the game', function() {
-			var _andysGuid;
-			var _readyAttempt;
-
-			var playersSignUp = function() {
-				return Promise.all([
-					player.signUp('Jan'),
-					player.signUp('Andy')
-				])
-				.then(function(guids) {
-					_andysGuid = guids[1];
-					return guids[0];
-				});
-			};
-
-			var janCreatesGame = function(jansGuid) {
-				return game.create(jansGuid);
-			};
-
-			var andyGetsReady = function(gameId) {
-				_readyAttempt = game.ready(_andysGuid, gameId);
-			};
-
-			var assert = function() {
-				return expect(_readyAttempt)
-					.to.be.rejectedWith('Player is not in game');
-			};
-
-			return playersSignUp()
-				.then(janCreatesGame)
-				.then(andyGetsReady)
 				.then(assert);
 		});
 	});

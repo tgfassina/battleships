@@ -1,4 +1,4 @@
-var Archetype = function(player, game) {
+var Archetype = function(player, lobby, game) {
 
 	var api = {};
 
@@ -21,14 +21,14 @@ var Archetype = function(player, game) {
 	};
 
 	var createGame = function(state) {
-		return game.create(state.guidP1).then(function(gameId) {
+		return lobby.create(state.guidP1).then(function(gameId) {
 			state.gameId = gameId;
 			return state;
 		});
 	};
 
 	var joinGame = function(state) {
-		return game.join(state.guidP2, state.gameId).then(function() {
+		return lobby.join(state.guidP2, state.gameId).then(function() {
 			return state;
 		});
 	};
