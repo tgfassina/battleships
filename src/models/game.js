@@ -26,15 +26,11 @@ var Game = function(gameDao, playerDao) {
 		var assertNoCollision = function(gameData) {
 			var player = getPlayer(gameData, guid);
 
-			var collision = false
-			_.forEach(gameData.board[player], function(placedShip) {
-				if (!placedShip) return;
-				if (placedShip.ship === ship.ship) return;
-				if (Ship.hasCollision(placedShip, ship)) {
-					collision = true;
-				}
-			});
+			var reducer = function(collision, placedShip) {
+				return collision || Ship.hasCollision(placedShip, ship);
+			};
 
+			var collision = _.reduce(gameData.board[player], reducer, false);
 			if (collision) {
 				return Promise.reject('Ships cannot collide');
 			}
@@ -151,14 +147,12 @@ var Game = function(gameDao, playerDao) {
 		};
 
 		var returnShotResult = function(gameData) {
-			var hit = false;
 			var enemy = getEnemy(gameData, guid);
 
-			_.forEach(gameData.board[enemy], function(enemyShip) {
-				if (Ship.occupiesTile(enemyShip, shot)) {
-					hit = true;
-				}
-			});
+			var reducer = function(hit, enemyShip) {
+				return hit || Ship.occupiesTile(enemyShip, shot);
+			};
+			var hit = _.reduce(gameData.board[enemy], reducer, false);
 
 			return hit ? 'Hit' : 'Miss';
 		};

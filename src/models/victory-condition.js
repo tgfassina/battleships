@@ -3,40 +3,39 @@ var Ship = require('./ship.js');
 
 var VictoryConditions = {};
 VictoryConditions.run = function(gameData) {
-	var p1Score = 0;
-	var p2Score = 0;
+	var r = {
+		p1Score: 0,
+		p2Score: 0,
+		winner: null,
+		complete: false
+	};
 
 	_.forEach(gameData.moves.p1, function(move) {
 		_.forEach(gameData.board.p2, function(ship) {7
 			if (Ship.occupiesTile(ship, move)) {
-				p1Score++;
+				r.p1Score++;
 			}
 		});
 	});
-
-	if (p1Score >= 17) {
-		return {
-			complete: true,
-			winner: gameData.player1
-		};
-	}
 
 	_.forEach(gameData.moves.p2, function(move) {
 		_.forEach(gameData.board.p1, function(ship) {
 			if (Ship.occupiesTile(ship, move)) {
-				p2Score++;
+				r.p2Score++;
 			}
 		});
 	});
 
-	if (p2Score >= 17) {
-		return {
-			complete: true,
-			winner: gameData.player2
-		};
+	if (r.p1Score >= 17) {
+		r.winner = gameData.player1;
+		r.complete = true;
+	}
+	if (r.p2Score >= 17) {
+		r.winner = gameData.player1;
+		r.complete = true;
 	}
 
-	return {complete: false};
+	return r;
 };
 
 module.exports = VictoryConditions;

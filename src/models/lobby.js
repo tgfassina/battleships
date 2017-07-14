@@ -67,15 +67,14 @@ var Lobby = function(gameDao, playerDao) {
 				status = 'playing';
 			}
 
-			var result = VictoryCondition.run(gameData)
-			if (result.complete) {
+			var stats = VictoryCondition.run(gameData)
+			if (stats.complete) {
 				status = 'complete';
-				winner = result.winner;
 			};
 
 			return {
-				status: status,
-				winner: winner
+				phase: status,
+				stats: stats
 			};
 		};
 

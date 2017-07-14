@@ -32,16 +32,19 @@ Ship.occupiesTile = function(ship, tile) {
 };
 
 Ship.hasCollision = function(ship1, ship2) {
-	var tiles1 = getShipTiles(ship1);
+	if (!ship1 || !ship2) {
+		return false;
+	}
 
-	var hasCollision = false;
-	_.forEach(tiles1, function(tile) {
-		if (Ship.occupiesTile(ship2, tile)) {
-			hasCollision = true;
-		}
-	});
+	if (ship1.ship === ship2.ship) {
+		return false;
+	}
 
-	return hasCollision;
+	var reducer = function(hasCollision, ship1Tile) {
+		return hasCollision || Ship.occupiesTile(ship2, ship1Tile);
+	};
+
+	return _.reduce(getShipTiles(ship1), reducer, false);
 };
 
 var getShipTiles = function(ship) {
