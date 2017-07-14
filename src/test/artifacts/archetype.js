@@ -1,6 +1,24 @@
-var Archetype = function(player, lobby, game) {
+var Player = require('../../models/player.js');
+var Lobby = require('../../models/lobby.js');
+var Game = require('../../models/game.js');
 
-	var api = {};
+var playerDaoFake = require('./player-dao-fake.js');
+var gameDaoFake = require('./game-dao-fake.js');
+
+var Archetype = function() {
+
+	var player = Player(playerDaoFake);
+	var lobby = Lobby(gameDaoFake, playerDaoFake);
+	var game = Game(gameDaoFake, playerDaoFake);
+
+
+	var api = {
+		models: {
+			player: player,
+			lobby: lobby,
+			game: game
+		}
+	};
 
 	var signUpOne = function() {
 		return player.signUp('Nameless').then(function(guid) {
