@@ -46,7 +46,7 @@ describe('Gameplay', function() {
 				.then(assert);
 		});
 
-		it('should be on players turn', function() {
+		it('should respect players turn', function() {
 			var _p1Fail;
 			var _p2Fail;
 
@@ -121,6 +121,21 @@ describe('Gameplay', function() {
 				.then(assertMiss)
 				.then(hitShot)
 				.then(assertHit);
+		});
+
+		it('should be able to shoot ship tails', function() {
+			var shoot = function(state) {
+				var shot = {x: 1, y: 0};
+				return game.shoot(state.guidP1, state.gameId, shot);
+			};
+
+			var assert = function(result) {
+				return expect(result).to.equal('Hit');
+			};
+
+			return archetype.forTwoPlayersLobbyStarted()
+				.then(shoot)
+				.then(assert);
 		});
 	});
 });
