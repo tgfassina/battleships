@@ -39,8 +39,8 @@ var Archetype = function() {
 	};
 
 	var createGame = function(state) {
-		return lobby.create(state.guidP1).then(function(gameId) {
-			state.gameId = gameId;
+		return lobby.create(state.guidP1).then(function(response) {
+			state.gameId = response.gameId;
 			return state;
 		});
 	};

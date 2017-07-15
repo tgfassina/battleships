@@ -242,8 +242,8 @@ describe('Game setup', function() {
 				return lobby.create(jansGuid);
 			};
 
-			var andyGetsReady = function(gameId) {
-				_readyAttempt = game.ready(_andysGuid, gameId);
+			var andyGetsReady = function(response) {
+				_readyAttempt = game.ready(_andysGuid, response.gameId);
 			};
 
 			var assert = function() {

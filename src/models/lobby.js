@@ -11,13 +11,16 @@ var Lobby = function(gameDao, playerDao) {
 			return gameDao.save(gameData);
 		};
 
-		var returnGameId = function(gameData) {
-			return gameData['_id'];
+		var response = function(gameData) {
+			return {
+				message: 'Lobby created',
+				gameId: gameData._id
+			}
 		};
 
 		return assertPlayerExists(guid)
 			.then(createGame)
-			.then(returnGameId);
+			.then(response);
 	};
 
 	api.join = function(guid, gameId) {
@@ -42,16 +45,19 @@ var Lobby = function(gameDao, playerDao) {
 
 		var joinLobby = function(gameData) {
 			gameData.player2 = guid;
-			return gameDao.update(gameData._id, gameData).then(function() {
-				return 'Lobby joined';
-			});
+			return gameDao.update(gameData._id, gameData);
+		};
+
+		var response = function() {
+			return {message: 'Lobby joined'};
 		};
 
 		return assertPlayerExists(guid)
 			.then(getGame)
 			.then(checkAlreadyPlaying)
 			.then(assertSlotIsAvailable)
-			.then(joinLobby);
+			.then(joinLobby)
+			.then(response);
 	};
 
 	api.status = function(gameId) {
