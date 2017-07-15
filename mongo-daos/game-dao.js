@@ -26,8 +26,11 @@ var GameDao = function(mongoose) {
 		return game.save();
 	};
 
-	api.update = function(id, data) {
-		return Model.findByIdAndUpdate(id, data);
+	api.updateAttribute = function(id, attribute, value) {
+		return Model.update(
+			{_id: id},
+			{$set: {[attribute]: value}}
+		);
 	};
 
 	api.getById = function(id) {

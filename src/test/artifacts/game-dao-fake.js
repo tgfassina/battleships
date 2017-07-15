@@ -14,10 +14,9 @@ fake.save = function(data) {
 	return Promise.resolve(newData);
 };
 
-fake.update = function(id, data) {
-	var newData = _.cloneDeep(data);
-	fake.data[id] = newData;
-	return Promise.resolve(newData);
+fake.updateAttribute = function(id, attribute, value) {
+	_.set(fake.data[id], attribute, value);
+	return Promise.resolve();
 };
 
 fake.getById = function(id) {

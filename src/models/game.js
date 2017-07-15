@@ -1,60 +1,49 @@
-var _ = require('lodash');
-var Ship = require('./ship.js');
-var VictoryCondition = require('./victory-condition.js');
+const _ = require('lodash');
+const Ship = require('./ship.js');
+const VictoryCondition = require('./victory-condition.js');
 
-var Game = function(gameDao, playerDao) {
+const Game = function(gameDao, playerDao) {
 
-	var api = {};
+	const api = {};
 
 	api.place = function(guid, gameId, ship) {
+		const _getPlayer = (gameData) => (getPlayer(gameData, guid));
 
-		var assertValidShip = function(gameData) {
-			if (ship.ship < 1 || ship.ship > 5) {
-				return Promise.reject('Invalid ship');
-			}
+		const assertValidShip = (gameData) => (
+			(ship.ship < 1 || ship.ship > 5) ?
+				Promise.reject('Invalid ship')
+				:
+				gameData
+		);
 
-			return gameData
-		};
+		const assertWithinBoard = (gameData) => (
+			!Ship.isWithinBoard(ship) ?
+				Promise.reject('Must place ship within board')
+				:
+				gameData
+		);
 
-		var assertWithinBoard = function(gameData) {
-			if (!Ship.isWithinBoard(ship)) {
-				return Promise.reject('Must place ship within board');
-			}
-			return gameData;
-		};
+		const _reducer = (collision, placedShip) => (
+			collision || Ship.hasCollision(placedShip, ship)
+		);
+		const assertNoCollision = (gameData) => (
+			_.reduce(gameData.board[_getPlayer(gameData)], _reducer, false) ?
+				Promise.reject('Ships cannot collide')
+				:
+				gameData
+		);
 
-		var assertNoCollision = function(gameData) {
-			var player = getPlayer(gameData, guid);
+		const placeShip = (gameData) => (
+			gameDao.updateAttribute(
+				gameData._id,
+				['board', _getPlayer(gameData), ship.ship].join('.'),
+				ship
+			)
+		);
 
-			var reducer = function(collision, placedShip) {
-				return collision || Ship.hasCollision(placedShip, ship);
-			};
+		const response = () => ({message: Ship.getName(ship)+' is placed'});
 
-			var collision = _.reduce(gameData.board[player], reducer, false);
-			if (collision) {
-				return Promise.reject('Ships cannot collide');
-			}
-
-			return gameData;
-		};
-
-		var placeShip = function(gameData) {
-			var player = getPlayer(gameData, guid);
-			gameData.board[player][ship.ship] = {
-				ship: ship.ship,
-				x: ship.x,
-				y: ship.y,
-				r: ship.r
-			};
-			return gameDao.update(gameData._id, gameData);
-		};
-
-		var response = function() {;
-			return {message: Ship.getName(ship)+' is placed'};
-		};
-
-		return assertPlayerInGame(guid, gameId)
-			.then(assertGameIsNotStarted)
+		return gameWithPlayerOnSetup(guid, gameId)
 			.then(assertValidShip)
 			.then(assertWithinBoard)
 			.then(assertNoCollision)
@@ -63,173 +52,136 @@ var Game = function(gameDao, playerDao) {
 	};
 
 	api.ready = function(guid, gameId) {
+		const _getPlayer = (gameData) => (getPlayer(gameData, guid));
 
-		var assertShipsArePlaced = function(gameData) {
+		const _reducer = (carry, placement) => (carry || !placement);
+		const assertNoShipsRemaining = (gameData) => (
+			_.reduce(gameData.board[_getPlayer(gameData)], _reducer, false) ?
+				Promise.reject('Must place all ships')
+				:
+				gameData
+		);
 
-			var reducer = function(carry, placement) {
-				return placement && carry;
-			};
+		const setAsReady = (gameData) => (
+			gameDao.updateAttribute(
+				gameData._id,
+				['ready', _getPlayer(gameData)].join('.'),
+				true
+			)
+		);
 
-			var player = getPlayer(gameData, guid);
-			var allPlaced = _.reduce(gameData.board[player], reducer, true);
+		const response = () => ({message: 'You are ready'});
 
-			if (!allPlaced) {
-				return Promise.reject('Must place all ships');
-			}
-
-			return gameData;
-		};
-
-		var setAsReady = function(gameData) {
-			var player = getPlayer(gameData, guid);
-			gameData.ready[player] = true;
-			return gameDao.update(gameData._id, gameData);
-		};
-
-		var response = function() {
-			return {message: 'You are ready'};
-		};
-
-		return assertPlayerInGame(guid, gameId)
-			.then(assertShipsArePlaced)
-			.then(assertGameIsNotStarted)
+		return gameWithPlayerOnSetup(guid, gameId)
+			.then(assertNoShipsRemaining)
 			.then(setAsReady)
 			.then(response);
 	};
 
 	api.shoot = function(guid, gameId, shot) {
+		const _getPlayer = (gameData) => (getPlayer(gameData, guid));
+		const _getEnemy = (gameData) => (getEnemy(gameData, guid));
 
-		var assertGameNotOver = function(gameData) {
-			var result = VictoryCondition.run(gameData)
-			if (result.complete) {
-				return Promise.reject('Game is complete');
-			};
-			return gameData;
-		};
+		const assertGameNotOver = (gameData) => (
+			VictoryCondition.run(gameData).complete ?
+				Promise.reject('Game is complete')
+				:
+				gameData
+		);
 
-		var assertPlayerTurn = function(gameData) {
-			var moves = gameData.moves;
-			var hasTheTurn = moves.p1.length > moves.p2.length ? 'p2' : 'p1';
+		const _hasTheTurn = (moves) => (
+			(moves.p1.length > moves.p2.length) ? 'p2' : 'p1'
+		);
+		const assertPlayerTurn = (gameData) => (
+			(_hasTheTurn(gameData.moves) != _getPlayer(gameData)) ?
+				Promise.reject('Not your turn')
+				:
+				gameData
+		);
 
-			var player = getPlayer(gameData, guid);
-			if (hasTheTurn != player) {
-				return Promise.reject('Not your turn');
-			}
+		const assertWithinBoard = (gameData) => (
+			(shot.x < 0 || shot.x > 9 || shot.y < 0 || shot.y > 9) ?
+				Promise.reject('Must shoot within board')
+				:
+				gameData
+		);
 
-			return gameData;
-		};
+		const _reducer = (carry, move) => (
+			(shot.x === move.x && shot.y === move.y) || carry
+		);
+		const assertNotDuplicated = (gameData) => (
+			_.reduce(gameData.moves[_getPlayer(gameData)], _reducer, false) ?
+				Promise.reject('Duplicated shot')
+				:
+				gameData
+		);
 
-		var assertWithinBoard = function(gameData) {
-			if (shot.x < 0 || shot.x > 9 || shot.y < 0 || shot.y > 9) {
-				return Promise.reject('Must shoot within board');
-			}
-			return gameData;
-		};
+		const saveShot = (gameData) => (
+			gameDao.updateAttribute(
+				gameData._id,
+				['moves', _getPlayer(gameData)].join('.'),
+				gameData.moves[_getPlayer(gameData)].concat(shot)
+			).then(() => (gameData))
+		);
 
-		var assertUniqueShot = function(gameData) {
-			var player = getPlayer(gameData, guid);
+		const _hitReducer = (hit, enemyShip) => (
+			hit || Ship.occupiesTile(enemyShip, shot)
+		);
+		const response = (gameData) => (
+			_.reduce(gameData.board[_getEnemy(gameData)], _hitReducer, false) ?
+				{message: 'Hit'}
+				:
+				{message: 'Miss'}
+		);
 
-			var reducer = function(unique, move) {
-				var isEqual = shot.x === move.x && shot.y === move.y;
-				return !isEqual && unique;
-			};
-
-			var unique = _.reduce(gameData.moves[player], reducer, true);
-
-			if (!unique) {
-				return Promise.reject('Duplicated shot');
-			}
-
-			return gameData;
-		};
-
-		var saveShot = function(gameData) {
-			var player = getPlayer(gameData, guid);
-			gameData.moves[player].push(shot);
-			return gameDao.update(gameData._id, gameData).then(function() {
-				return gameData;
-			});
-		};
-
-		var response = function(gameData) {
-			var enemy = getEnemy(gameData, guid);
-
-			var reducer = function(hit, enemyShip) {
-				return hit || Ship.occupiesTile(enemyShip, shot);
-			};
-			var hit = _.reduce(gameData.board[enemy], reducer, false);
-
-			return {message: hit ? 'Hit' : 'Miss'};
-		};
-
-		return assertPlaying(guid, gameId)
+		return gameWithPlayerAndStarted(guid, gameId)
 			.then(assertGameNotOver)
 			.then(assertPlayerTurn)
 			.then(assertWithinBoard)
-			.then(assertUniqueShot)
+			.then(assertNotDuplicated)
 			.then(saveShot)
 			.then(response);
 	};
 
 
-	var assertGameIsNotStarted = function(gameData) {
-		if (gameData.ready.p1 && gameData.ready.p2) {
-			return Promise.reject('Game already started');
-		}
-		return gameData;
-	};
+	const _assertInGame = (gameData, guid) => (
+		(gameData.player1 != guid && gameData.player2 != guid) ?
+			Promise.reject('Player is not in game')
+			:
+			gameData
+	);
+	const gameWithPlayer = (guid, gameId) => (
+		gameDao.getById(gameId).then(gameData => _assertInGame(gameData, guid))
+	);
 
-	var assertPlayerInGame = function(guid, gameId) {
-		var assert = function(gameData) {
-			var isPlayer1 = gameData.player1 === guid;
-			var isPlayer2 = gameData.player2 === guid;
+	const _assertOnSetup = (gameData) => (
+		(gameData.ready.p1 && gameData.ready.p2) ?
+			Promise.reject('Game already started')
+			:
+			gameData
+	);
+	const gameWithPlayerOnSetup = (guid, gameId) => (
+		gameWithPlayer(guid, gameId).then(_assertOnSetup)
+	);
 
-			if (!isPlayer1 && !isPlayer2) {
-				return Promise.reject('Player is not in game');
-			}
-
-			return gameData;
-		}
-
-		return gameDao.getById(gameId).then(assert);
-	};
-
-	var assertPlaying = function(guid, gameId) {
-		var assertGameStarted = function(gameData) {
-			if (!gameData.ready.p1 || !gameData.ready.p2) {
-				return Promise.reject('Game not started yet');
-			}
-			return gameData;
-		};
-
-		return assertPlayerInGame(guid, gameId)
-			.then(assertGameStarted);
-	};
+	const _assertStarted = (gameData) => (
+		(!gameData.ready.p1 || !gameData.ready.p2) ?
+			Promise.reject('Game not started yet')
+			:
+			gameData
+	);
+	const gameWithPlayerAndStarted = (guid, gameId) => (
+		gameWithPlayer(guid, gameId).then(_assertStarted)
+	);
 
 
-	var getPlayer = function(gameData, guid) {
-		if (gameData.player1 === guid) {
-			return 'p1';
-		}
+	const getPlayer = (gameData, guid) => (
+		(gameData.player1 === guid) ? 'p1' : 'p2'
+	);
 
-		if (gameData.player2 === guid) {
-			return 'p2';
-		}
-
-		return null;
-	};
-
-	var getEnemy = function(gameData, guid) {
-		if (gameData.player1 === guid) {
-			return 'p2';
-		}
-
-		if (gameData.player2 === guid) {
-			return 'p1';
-		}
-
-		return null;
-	};
+	const getEnemy = (gameData, guid) => (
+		(gameData.player1 === guid) ? 'p2' : 'p1'
+	);
 
 	return api;
 };
