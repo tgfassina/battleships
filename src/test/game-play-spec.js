@@ -104,7 +104,7 @@ describe('Gameplay', function() {
 			};
 
 			var assertMiss = function(result) {
-				return expect(result).to.equal('Miss');
+				return expect(result.message).to.equal('Miss');
 			};
 
 			var hitShot = function() {
@@ -113,7 +113,7 @@ describe('Gameplay', function() {
 			};
 
 			var assertHit = function(result) {
-				return expect(result).to.equal('Hit');
+				return expect(result.message).to.equal('Hit');
 			};
 
 			return archetype.forTwoPlayersLobbyStarted()
@@ -131,7 +131,7 @@ describe('Gameplay', function() {
 			};
 
 			var assert = function(result) {
-				return expect(result).to.equal('Hit');
+				return expect(result.message).to.equal('Hit');
 			};
 
 			return archetype.forTwoPlayersLobbyStarted()

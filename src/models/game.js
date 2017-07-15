@@ -49,8 +49,8 @@ var Game = function(gameDao, playerDao) {
 			return gameDao.update(gameData._id, gameData);
 		};
 
-		var returnName = function() {;
-			return Ship.getName(ship);
+		var response = function() {;
+			return {message: Ship.getName(ship)+' is placed'};
 		};
 
 		return assertPlayerInGame(guid, gameId)
@@ -59,7 +59,7 @@ var Game = function(gameDao, playerDao) {
 			.then(assertWithinBoard)
 			.then(assertNoCollision)
 			.then(placeShip)
-			.then(returnName);
+			.then(response);
 	};
 
 	api.ready = function(guid, gameId) {
@@ -86,10 +86,15 @@ var Game = function(gameDao, playerDao) {
 			return gameDao.update(gameData._id, gameData);
 		};
 
+		var response = function() {
+			return {message: 'You are ready'};
+		};
+
 		return assertPlayerInGame(guid, gameId)
 			.then(assertShipsArePlaced)
 			.then(assertGameIsNotStarted)
-			.then(setAsReady);
+			.then(setAsReady)
+			.then(response);
 	};
 
 	api.shoot = function(guid, gameId, shot) {
@@ -146,7 +151,7 @@ var Game = function(gameDao, playerDao) {
 			});
 		};
 
-		var returnShotResult = function(gameData) {
+		var response = function(gameData) {
 			var enemy = getEnemy(gameData, guid);
 
 			var reducer = function(hit, enemyShip) {
@@ -154,7 +159,7 @@ var Game = function(gameDao, playerDao) {
 			};
 			var hit = _.reduce(gameData.board[enemy], reducer, false);
 
-			return hit ? 'Hit' : 'Miss';
+			return {message: hit ? 'Hit' : 'Miss'};
 		};
 
 		return assertPlaying(guid, gameId)
@@ -163,7 +168,7 @@ var Game = function(gameDao, playerDao) {
 			.then(assertWithinBoard)
 			.then(assertUniqueShot)
 			.then(saveShot)
-			.then(returnShotResult);
+			.then(response);
 	};
 
 

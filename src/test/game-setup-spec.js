@@ -68,7 +68,7 @@ describe('Game setup', function() {
 			};
 
 			var assert = function(result) {
-				return expect(result).to.equal('Carrier');
+				return expect(result.message).to.equal('Carrier is placed');
 			};
 
 			return archetype.forSinglePlayerLobby()
@@ -169,38 +169,6 @@ describe('Game setup', function() {
 
 			return archetype.forSinglePlayerLobby()
 				.then(placeOutside)
-				.then(assert);
-		});
-
-		it('should inform ship name when successfully placed', function() {
-			var ship1 = {ship: 1, x: 0, y: 0, r: 2};
-			var ship2 = {ship: 2, x: 0, y: 1, r: 2};
-			var ship3 = {ship: 3, x: 0, y: 2, r: 2};
-			var ship4 = {ship: 4, x: 0, y: 3, r: 2};
-			var ship5 = {ship: 5, x: 0, y: 4, r: 2};
-
-			var placeShips = function(state) {
-				return {
-					p1: game.place(state.guidP1, state.gameId, ship1),
-					p2: game.place(state.guidP1, state.gameId, ship2),
-					p3: game.place(state.guidP1, state.gameId, ship3),
-					p4: game.place(state.guidP1, state.gameId, ship4),
-					p5: game.place(state.guidP1, state.gameId, ship5)
-				};
-			};
-
-			var assert = function(placements) {
-				return Promise.all([
-					expect(placements.p1).to.eventually.equal('Carrier'),
-					expect(placements.p2).to.eventually.equal('Battleship'),
-					expect(placements.p3).to.eventually.equal('Cruiser'),
-					expect(placements.p4).to.eventually.equal('Submarine'),
-					expect(placements.p5).to.eventually.equal('Destroyer')
-				]);
-			};
-
-			return archetype.forSinglePlayerLobby()
-				.then(placeShips)
 				.then(assert);
 		});
 	});
